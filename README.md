@@ -69,7 +69,7 @@ make start-web-new-project  # Démarre les services
 
 Le projet utilise une architecture basée sur les **patterns de conception** (Strategy, Factory, Chain of Responsibility) pour la création d'applications selon différentes technologies (PHP, Symfony, Laravel, Node.js).
 
-📚 **Documentation technique complète** : Voir [ARCHITECTURE.md](./ARCHITECTURE.md) pour les détails d'implémentation, l'extensibilité et les références aux classes.
+📚 **Documentation technique complète** : Voir [ARCHITECTURE.md](./docs/ARCHITECTURE.md) pour les détails d'implémentation, l'extensibilité et les références aux classes.
 
 ## Structure du projet
 
