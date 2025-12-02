@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'client.list.title'|trans }}{% endblock %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <twig:Breadcrumb label="{{ client }}"/>
+{% endblock %}
+
+{% block body %}
+    <!-- Start block -->
+
+    <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+        <div class="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
+            <div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+                <a href="{{ path('app_project_new', {'client': client}) }}"
+                   class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                    <i class="fas fa-plus"></i> {{ 'client.new_project'|trans }}
+                </a>
+            </div>
+        </div>
+        <twig:FlashMessage/>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+
+                    <th scope="col" class="p-4">{{ 'table.client'|trans }}</th>
+                    <th scope="col" class="p-4">{{ 'table.project'|trans }}</th>
+                    <th scope="col" class="p-4">{{ 'table.traefik_network'|trans }}</th>
+                    <th scope="col" class="p-4">{{ 'table.environment'|trans }}</th>
+                    <th scope="col" class="p-4">{{ 'table.services'|trans }}</th>
+                    <th scope="col" class="p-4">{{ 'table.actions'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for project in projects %}
+                    <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <td class="px-4 py-3">{{ project.client }}</td>
+                        <td class="px-4 py-3">{{ project.project }}</td>
+                        <td class="px-4 py-3">{{ project.traefikNetwork }}</td>
+                        <td class="px-4 py-3">{{ project.environmentContainer.value }}</td>
+                        <td class="px-4 py-3">{{ project.serviceContainer|length }}</td>
+                        <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                            <div class="flex items-center space-x-4">
+                                <a href="{{ path('app_project_edit', {'client': project.client, 'project': project.project}) }}"
+                                   class="btn btn-sm btn-warning">
+                                    <i class="fas fa-cogs"></i> {{ 'button.configure'|trans }}
+                                </a>
+                                <a href="{{ path('app_docker_logs', {'client': project.client, 'project': project.project, 'action': enum('App\\Enum\\DockerAction').BUILD.value }) }}"
+                                   class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> {{ 'docker.button.build'|trans }}
+                                </a>
+
+                                <a href="{{ path('app_docker_logs', {'client': project.client, 'project': project.project, 'action': enum('App\\Enum\\DockerAction').START.value }) }}"
+                                   class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> {{ 'docker.button.start'|trans }}
+                                </a>
+
+                                <a href="{{ path('app_docker_logs', {'client': project.client, 'project': project.project, 'action': enum('App\\Enum\\DockerAction').STOP.value }) }}"
+                                   class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> {{ 'docker.button.stop'|trans }}
+                                </a>
+
+                                <a href="{{ path('app_docker_logs', {'client': project.client, 'project': project.project, 'action': enum('App\\Enum\\DockerAction').DELETE.value }) }}"
+                                   class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> {{ 'docker.button.delete'|trans }}
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+{% endblock %}

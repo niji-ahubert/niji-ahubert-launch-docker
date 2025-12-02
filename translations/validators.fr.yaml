@@ -1,0 +1,36 @@
+validator:
+  client:
+    name_already_exists: "Un client avec le nom {{ client_name }} existe déjà."
+    name_filesystem_error: "Erreur lors de la vérification de l'unicité du nom. Veuillez réessayer."
+    not_blank: "Le nom du client ne peut pas être vide."
+    min_length: "Le nom du client doit contenir au moins {{ limit }} caractères."
+    max_length: "Le nom du client ne peut pas dépasser {{ limit }} caractères."
+    invalid_characters: "Le nom du client ne peut contenir que des lettres, chiffres, tirets (-) et underscores (_)."
+    reserved_name: "Ce nom est réservé par le système et ne peut pas être utilisé."
+    invalid_folder_name: "Ce nom ne peut pas être utilisé comme nom de dossier."
+    dot_not_allowed: "Le nom ne peut pas commencer ou finir par un point."
+    empty_or_whitespace: "Le nom ne peut pas être vide ou contenir uniquement des espaces."
+  project:
+    already_exists: 'Le projet "{{ project }}" existe déjà pour le client "{{ client }}".'
+    service:
+      name:
+        already_exists: 'Le service "{{ value }}" est déjà utilisé dans le projet.'
+  service:
+    type_already_exists: 'Vous avez déjà un service de type "{{ type }}" dans ce projet.'
+    container_name_already_exists: 'Un service avec le nom {{ container_name }} existe déjà.'
+    framework_language: "Le framework choisi doit être un framework {{ language }}"
+    framework_required_php: "Le framework est obligatoire pour PHP"
+    framework_required_node: "Le framework est obligatoire pour Node.js"
+    no_framework_allowed: "Aucun framework ne doit être sélectionné pour ce langage"
+    version_framework_invalid: 'La version du framework doit être compatible avec le framework choisi.'
+    version_invalid: 'La version du service doit être une version {{ language }} valide.'
+    github_repository_format: "Le repository doit être une URL SSH Git valide (ex: git@github.com:organisation/repo.git)"
+    language_required: "Le langage est obligatoire"
+    version_required: "La version du service est obligatoire"
+    folder_name_required: "Le nom du dossier est obligatoire"
+    url_service_required: "L'URL du service est obligatoire"
+    url_service_docker_localhost: "L'URL du service doit se terminer par '.docker.localhost'"
+    webserver_required: "Le serveur web est obligatoire"
+    webserver_choice: "Le serveur web doit être local, apache ou nginx"
+    not_blank: "Veuillez choisir un service"
+    version_not_blank: "Veuillez choisir une version de service"

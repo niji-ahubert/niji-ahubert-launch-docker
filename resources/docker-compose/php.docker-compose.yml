@@ -1,0 +1,64 @@
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK}
+volumes:
+  composer-cache:
+services:
+  php-dev:
+    container_name: ${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}
+    image: project-${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}
+    user: ${HOST_UID:-1000}
+    profiles:
+      - runner-dev
+    networks:
+      - traefik
+    build:
+      target: stage_dev
+      context: ./../../projects/${CLIENT}/${PROJECT}/${FOLDER_NAME}
+      dockerfile: LauncherDockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    volumes:
+      - ${PROJECT_ROOT}/projects/${CLIENT}/${PROJECT}/${FOLDER_NAME}:/var/www/html/projects/${CLIENT}/${PROJECT}/${FOLDER_NAME}:rw
+      - ${PROJECT_ROOT}/tools:/opt/tools
+      - ${PROJECT_ROOT}/resources/docker/entrypoint/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint
+      - ${PROJECT_ROOT}/src/Resources:/opt/scripts
+      - composer-cache:/composer-cache:rw
+      - ~/.ssh:/home/admin/.ssh:ro
+      - ~/.ssh:/root/.ssh:ro
+    env_file:
+      - "./../../projects/${CLIENT}/${PROJECT}/config/${FOLDER_NAME}.env"
+      - "./../../projects/${CLIENT}/${PROJECT}/${FOLDER_NAME}/.env.niji-launcher"
+    labels:
+      - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}.rule=Host(`${URL_LOCAL_WEBSITE}`)
+      - traefik.enable=true
+      - traefik.http.services.${CLIENT}-${PROJECT}${FOLDER_NAME}.loadbalancer.server.port=${PORT_NUMBER:-9000}
+      - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}.tls=true
+    environment:
+      XDEBUG_MODE: "${XDEBUG_MODE:-debug}"
+      XDEBUG_CONFIG: "client_host=${IP_WSL_ETH:-host.docker.internal}"
+      PHP_IDE_CONFIG: "serverName=${URL_LOCAL_WEBSITE}"
+      COMPOSER_CACHE_DIR: /composer-cache
+  php-prod:
+    profiles:
+      - runner-dev
+    image: project-${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}:${TAG_VERSION:-latest}
+    env_file: "./projects/${CLIENT}/${PROJECT}/config/${FOLDER_NAME}.env"
+    networks:
+      - traefik
+    build:
+      target: stage_prod
+      context: ./../../projects/${CLIENT}/${PROJECT}
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+        PROJECT: ${PROJECT}
+        CLIENT: ${CLIENT}
+    labels:
+      - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}-prod.rule=Host(`${URL_LOCAL_WEBSITE}`)
+      - traefik.enable=true
+      - traefik.http.services.${CLIENT}-${PROJECT}${FOLDER_NAME}-prod.loadbalancer.server.port=${PORT_NUMBER:-9000}
+      - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}-prod.tls=true
+    volumes:
+      - ${PROJECT_ROOT}/src/Resources/docker/entrypoint/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint
+      - composer-cache:/composer-cache:rw

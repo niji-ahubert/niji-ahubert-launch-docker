@@ -1,0 +1,65 @@
+version: '3'
+
+vars:
+  PROJECT_ROOT:
+    sh: 'pwd'
+  DOCKER_GID:
+    sh: 'getent group docker | cut -d: -f3'
+  DOCKER_COMP: docker --log-level=ERROR compose --project-name generator-socle
+  DOCKER_EXEC: '{{.DOCKER_COMP}} exec'
+  DOCKER_ADMIN_COMP: docker --log-level=ERROR compose -f docker-compose.admin.yml
+  ENV_IP_WSL_ETH:
+    sh: printenv IP_WSL_ETH
+tasks:
+  assets-compile:
+    desc: "🔧 Compile Symfony assets"
+    cmds:
+      - '{{.DOCKER_ADMIN_COMP}} exec webserver-php bin/console asset-map:compile'
+
+  bash:
+    desc: "🐚 Start a bash shell in webserver for new project"
+    silent: true
+    cmds:
+      - '{{.DOCKER_ADMIN_COMP}} --profile webserver --profile webserver exec webserver-php bash'
+
+
+  default:
+    desc: "Show help message"
+    silent: true
+    cmds:
+      - task --list
+
+  requirement:
+    desc: "🔍 Check and validate requirements"
+    internal: true
+    silent: true
+    cmds:
+      - |
+        echo "🔍 Vérification des prérequis système"
+        echo "✅ Tous les prérequis sont satisfaits"
+
+  start:
+    desc: "🚀 Start webserver for new project development"
+    silent: true
+    deps:
+      - requirement
+      - traefik_up
+      - stop
+    cmds:
+      - echo "🚀 Start webserver for new project development"
+      - 'IP_WSL_ETH={{.ENV_IP_WSL_ETH}} DOCKER_GID={{.DOCKER_GID}} PROJECT_ROOT={{.PROJECT_ROOT}} HOST_UID=$(id -u) HOST_GID=$(id -g) {{.DOCKER_ADMIN_COMP}} --profile webserver up --detach'
+      - echo "🌐 Votre application est disponible sur https://niji-generator.docker.localhost"
+
+  stop:
+    desc: "⏹️ Stop the docker-compose stack for new project"
+    silent: true
+    cmds:
+      - echo "⏹️ Stop the docker-compose stack for new project"
+      - '{{.DOCKER_ADMIN_COMP}} --profile webserver down --remove-orphans'
+
+  traefik_up:
+    desc: "🌐 Start and check Traefik health"
+    internal: true
+    silent: true
+    cmds:
+      - ./bin/healthcheckTraefik.sh

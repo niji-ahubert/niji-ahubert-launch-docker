@@ -1,0 +1,42 @@
+@import '../vendor/flowbite/dist/flowbite.min.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Tailwind utilities - couleurs de texte */
+.text-blue-300 {
+    color: rgb(147 197 253);
+}
+
+.text-cyan-300 {
+    color: rgb(103 232 249);
+}
+
+.text-yellow-300 {
+    color: rgb(253 224 71);
+}
+
+.text-red-300 {
+    color: rgb(252 165 165);
+}
+
+.text-orange-300 {
+    color: rgb(253 186 116);
+}
+
+.text-gray-300 {
+    color: rgb(209 213 219);
+}
+
+/* Couleurs d'arrière-plan */
+.bg-black {
+    background-color: rgb(0 0 0);
+}
+
+/* Bordures */
+.border-gray-300 {
+    border-color: rgb(209 213 219);
+}
+
+/* Dark mode */
+.dark .dark\:border-gray-600 {
+    border-color: rgb(75 85 99);
+}

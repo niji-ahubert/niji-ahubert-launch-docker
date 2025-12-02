@@ -1,0 +1,316 @@
+# Messages généraux
+welcome: "Bienvenue"
+hello: "Bonjour"
+goodbye: "Au revoir"
+
+# Navigation
+nav:
+  project_generator: "Générateur de Projets"
+  project_list: "Liste des projets"
+  new_project: "Nouveau projet"
+  language: "Langue"
+
+# Langues
+language:
+  fr: "Français"
+  en: "Anglais"
+  current: "Langue actuelle"
+
+# Titres
+title:
+  project_generator: "Générateur de Projets"
+  project_list: "Liste des projets"
+  client_projects: "Projets du client %client%"
+  services: "Services"
+  edit_project_service: "Modifier le service projet"
+  add_project_service: "Ajouter un service projet"
+  client_add: "Ajouter un client"
+  client_form: "Formulaire de client"
+
+# Docker Logs
+docker:
+  action:
+    generate: "Générer le projet"
+    build: "Construire les images"
+    start: "Démarrer"
+    stop: "Arrêter"
+    clear_logs: "Effacer les logs"
+    start_project: "Démarrer le projet"
+    stop_project: "Arrêter le projet"
+    delete: "Supprimer"
+  logs:
+    title: "Logs Docker"
+    breadcrumb: "Logs Docker"
+    waiting: "En attente de démarrage de la commande..."
+    cleared: "Logs effacés"
+  command:
+    logs: "Afficher les logs"
+    build: "Construire les images"
+    up: "Démarrer les services"
+    down: "Arrêter les services"
+    ps: "Lister les conteneurs"
+    pull: "Télécharger les images"
+    restart: "Redémarrer les services"
+  button:
+    start: "Démarrer"
+    stop: "Arrêter"
+    build: "Construire les images"
+    run: "Exécuter"
+    running: "En cours..."
+    generate: "Générer le projet"
+    generating: "Génération en cours..."
+    building: "Construction en cours..."
+    clear: "Effacer"
+    start_project: "Démarrer le projet"
+    starting: "Démarrage en cours..."
+    stop_project: "Arrêter le projet"
+    stopping: "Arrêt en cours..."
+    clearing: "Effacement en cours..."
+    delete: "Supprimer"
+  status:
+    connected: "Connecté"
+    disconnected: "Déconnecté"
+  project:
+    path: "Chemin du projet"
+
+# Boutons
+button:
+  new_project: "Nouveau projet"
+  new_client: "Nouveau client"
+  back_to_clients: "Retour à la liste des clients"
+  back_to_project: "Retour au projet"
+  back_to_services: "Retour aux services"
+  configure: "Configurer"
+  delete: "Supprimer"
+  close: "Fermer"
+  edit: "Éditer"
+  cancel: "Annuler"
+  save: "Enregistrer"
+  add_service: "Ajouter un service"
+  new_service: "Nouveau Service"
+  webserver_config: "Configuration Webserver"
+  modify_service: "Modifier le service"
+
+# Client
+client:
+  list:
+    title: "Liste des Clients"
+  new_project: "Nouveau projet"
+  no_clients: "Aucun client n'a été créé."
+  add:
+    title: "Ajouter un client"
+    heading: "Créer un nouveau client"
+    back: "Retour"
+  edit:
+    title: "Modifier le client %client%"
+    heading: "Modifier le client"
+    back: "Retour"
+    submit: "Modifier le client"
+  form:
+    name:
+      label: "Nom du client"
+      placeholder: "Saisissez le nom du client (ex: mon-client-2024)"
+      help: "Le nom du client sera utilisé comme nom de dossier. Utilisez uniquement des lettres, chiffres, tirets et underscores (2-50 caractères). Le nom doit être unique."
+    submit:
+      label: "Créer le client"
+  validation:
+    name:
+      not_blank: "Le nom du client ne peut pas être vide."
+      min_length: "Le nom du client doit contenir au moins {{ limit }} caractères."
+      max_length: "Le nom du client ne peut pas dépasser {{ limit }} caractères."
+      invalid_characters: "Le nom du client ne peut contenir que des lettres, chiffres, tirets (-) et underscores (_)."
+      reserved_name: "Ce nom est réservé par le système et ne peut pas être utilisé."
+      invalid_folder_name: "Ce nom ne peut pas être utilisé comme nom de dossier."
+      dot_not_allowed: "Le nom ne peut pas commencer ou se terminer par un point."
+      empty_or_whitespace: "Le nom ne peut pas être vide ou contenir uniquement des espaces."
+      already_exists: "Un client avec le nom {client} existe déjà."
+      filesystem_error: "Erreur lors de la vérification de l'unicité du nom. Veuillez réessayer."
+  created:
+    success: "Le client %client% a été créé avec succès."
+    name:
+      available: "Le nom {{ client_name }} est disponible."
+  create_new_project: "Créer un nouveau projet"
+  label: "Client"
+  view_projects: "Voir les projets"
+
+  update:
+    success: "Le client {{ client_name }} a été mis à jour avec succès !"
+  delete:
+    confirm: "Êtes-vous sûr de vouloir supprimer le client %client% ?"
+    success: "Le client {{ client_name }} a été supprimé avec succès !"
+    error: "Une erreur est survenue lors de la suppression du client. Veuillez réessayer."
+
+message:
+  no_projects: "Aucun projet n'a été créé"
+  no_client_projects: "Aucun projet n'a été créé pour le client {client}"
+  create_new_project: "Créer un nouveau projet"
+  no_services: "Aucun service configuré"
+  add_new_service: "Ajouter un nouveau service"
+  confirm_delete: "Êtes-vous sûr de vouloir supprimer le service {service} ?"
+
+# Tableaux
+table:
+  client: "Client"
+  project: "Projet"
+  traefik_network: "Réseau Traefik"
+  environment: "Environnement"
+  services: "Services"
+  actions: "Actions"
+  type: "Type"
+  version: "Version"
+  service_name: "Nom du service"
+
+# Commun
+common:
+  actions: "Actions"
+
+# Formulaires
+form:
+  submit: "Envoyer"
+  cancel: "Annuler"
+  save: "Enregistrer"
+  delete: "Supprimer"
+  select_option: "Sélectionnez une option"
+  select_or_enter_client: "Sélectionnez ou saisissez un client"
+  language_config: "Configuration du langage"
+  project_info: "Informations du projet"
+  service_config: "Configuration du service"
+  required_extensions: "Extensions requises"
+  folder_name: "Nom du dossier"
+  webserver_choice: "Choisissez entre local, apache ou nginx"
+  github_repository: "Repository GitHub"
+  github_repository_help: "Utiliser l'URL SSH du repository (ex: git@github.com:organisation/repo.git)"
+  github_branch: "Branche Git"
+  github_branch_help: "Nom de la branche à cloner (par défaut: main)"
+  language: "Langage"
+  select_language: "Choisir un langage"
+  version_service: "Version du langage"
+  select_language_first: "Choisissez d'abord un langage"
+  framework: "Framework"
+  version_framework: "Version du framework"
+  select_framework_first: "Choisissez d'abord un framework"
+  select_extensions: "Sélectionner les extensions"
+  url_service: "URL du service"
+  url_service_help: "L'URL doit se terminer par docker.localhost (ex: mon-service.docker.localhost)"
+  webserver: "Serveur web"
+  select_webserver: "Choisir un serveur web"
+  service_external:
+    title: "Nouveau Service Externe"
+    service_name: "Service externe"
+    service_name_placeholder: "Sélectionner un service"
+    version: "Version du service"
+    version_placeholder: "Sélectionner une version"
+  create_new_project: "Créer un nouveau projet"
+  client: "Client"
+  project: "Projet"
+  traefik_network: "Réseau Traefik"
+  environment: "Environnement"
+  back: "Retour"
+
+# Messages d'erreur
+error:
+  required: "Ce champ est obligatoire"
+  invalid: "Valeur invalide"
+
+# Environnements
+environment:
+  dev: "Développement"
+  prod: "Production"
+
+# Serveurs Web
+webserver:
+  local: "Local"
+  apache: "Apache"
+  nginx: "Nginx"
+  update:
+    no_projects_affected: "Aucun projet n'utilise le webserver %webserver% supprimé."
+    projects_updated: "%count% projet(s) utilisant le webserver %webserver% ont été mis à jour vers 'local' : %projects%"
+
+# Versions
+version:
+  php:
+    '8.3': "PHP 8.3"
+    '8.2': "PHP 8.2"
+    '8.1': "PHP 8.1"
+  mysql:
+    '9': "MySQL 9"
+    '8': "MySQL 8"
+  mariadb:
+    '11': "MariaDB 11"
+    '10': "MariaDB 10"
+  pgsql:
+    '17': "PostgreSQL 17"
+    '16': "PostgreSQL 16"
+  redis:
+    '7': "Redis 7"
+    '6': "Redis 6"
+  node:
+    '18': "Node.js 18"
+    '20': "Node.js 20"
+    '22': "Node.js 22"
+    '23': "Node.js 23"
+    '24': "Node.js 24"
+  laravel:
+    '11': "Laravel 11"
+    '10': "Laravel 10"
+  symfony:
+    '7.1': "Symfony 7.1"
+    '6.4': "Symfony 6.4"
+
+# Frameworks
+framework:
+  language:
+    php:
+      symfony: "Symfony"
+      laravel: "Laravel"
+      custom: "PHP personnalisé"
+    node:
+      react: "React"
+      javascript: "JavaScript"
+
+# Projet
+project:
+  form:
+    new:
+      title: "Nouveau projet"
+    modify:
+      title: "Projet %project%"
+  delete:
+    confirm: 'Êtes-vous sûr de vouloir supprimer le projet %project% ? Cette action est irréversible.'
+    success: 'Le projet %client% > %project% a été supprimé avec succès !' # success
+    error: 'Une erreur est survenue %error%'
+  flash:
+    created_successfully: 'Le projet a été créé avec succès !'
+    updated_successfully: 'Le projet a été modifié avec succès !'
+    not_found: 'Projet non trouvé !'
+
+flash:
+  error:
+    generic_update: 'Une erreur est survenue lors de la mise à jour !'
+    title: 'Erreur !'
+  success:
+    title: 'Succès !'
+
+# Service
+service:
+  delete:
+    confirm: 'Êtes-vous sûr de vouloir supprimer le service %service% ?'
+  error:
+    already_exists: 'Vous avez déjà un service de type "{{ type }}" dans ce projet.'
+  success:
+    created: 'Service ajouté avec succès'
+    updated: 'Service mis à jour avec succès'
+    deleted: 'Service {{ service_name }} supprimé avec succès'
+
+# Validators
+validator:
+  service:
+    github_repository_format: "Le format du repository GitHub est invalide. Utilisez le format SSH (ex: git@github.com:organisation/repo.git)"
+    github_branch_format: "Le nom de la branche ne peut contenir que des lettres, chiffres, tirets, underscores et slashes"
+    language_required: "Le langage est obligatoire"
+    version_required: "La version est obligatoire"
+    folder_name_required: "Le nom du dossier est obligatoire"
+    url_service_required: "L'URL du service est obligatoire"
+    url_service_docker_localhost: "L'URL du service doit se terminer par .docker.localhost"
+    webserver_required: "Le serveur web est obligatoire"
+    webserver_choice: "Veuillez choisir un serveur web valide"

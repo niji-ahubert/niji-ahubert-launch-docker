@@ -1,0 +1,27 @@
+<!-- Configuration du service -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">{{ 'form.service_config'|trans }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form_label(form.urlService, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.urlService, {'attr': {'class': 'form-control', 'required': true}}) }}
+                    {{ form_help(form.urlService) }}
+                    {{ form_errors(form.urlService) }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form_label(form.webServer, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.webServer, {'attr': {'class': 'form-control', 'required': true}}) }}
+                    {{ form_help(form.webServer) }}
+                    {{ form_errors(form.webServer) }}
+                    <small class="form-text text-muted">{{ 'form.webserver_choice'|trans }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

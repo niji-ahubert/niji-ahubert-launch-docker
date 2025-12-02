@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html class="dark" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> {% block title %}{{ 'client.list.title'|trans }}{% endblock %}</title>
+
+    <link rel="icon" type="image/png" sizes="16x16"  href="{{ asset('images/favicon-16x16.png') }}">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+
+    {% block stylesheets %}
+        {# CSS géré par AssetMapper - suppression du lien statique #}
+    {% endblock %}
+    {% block javascripts %}
+        {% block importmap %}
+            {{ importmap('app') }}
+        {% endblock %}
+    {% endblock %}
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+<header>
+    <nav class="bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800">
+        <div class="flex flex-wrap items-center justify-between max-w-screen-xl mx-auto">
+            <a href="#" class="flex items-center">
+                <img src="{{ asset('images/logo1.png') }}" class="h-6 mr-3 sm:h-9" alt="LaunchDock Logo"/>
+                <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">LaunchDock</span>
+            </a>
+        </div>
+    </nav>
+</header>
+
+
+<section class="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5 antialiased">
+
+
+    <div class="mx-auto max-w-screen-2xl px-4 lg:px-12">
+        <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+
+                <nav class="flex" aria-label="Breadcrumb">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+
+
+                        {% block breadcrumb %}
+                            <li class="inline-flex items-center">
+                                <a href="{{ path('app_homepage') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+                                    <svg class="w-3 h-3 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
+                                    </svg>
+                                </a>
+                            </li>
+                        {% endblock %}
+                    </ol>
+                </nav>
+
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Start block -->
+<section class="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5 antialiased">
+
+    <div class="mx-auto max-w-screen-2xl px-4 lg:px-12">
+        {% block body %}
+        {% endblock %}
+    </div>
+</section>
+
+
+</body>
+
+
+</html>

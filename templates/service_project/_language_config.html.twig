@@ -1,0 +1,45 @@
+<!-- Configuration du langage -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">{{ 'form.language_config'|trans }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form_label(form.language, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.language, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_help(form.language) }}
+                    {{ form_errors(form.language) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.versionService, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.versionService, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_help(form.versionService) }}
+                    {{ form_errors(form.versionService) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.extensionsRequired, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.extensionsRequired) }}
+                    {{ form_help(form.extensionsRequired) }}
+                    {{ form_errors(form.extensionsRequired) }}
+                    <small class="form-text text-muted">{{ 'form.required_extensions'|trans }}</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form_label(form.framework, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.framework, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_help(form.framework) }}
+                    {{ form_errors(form.framework) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.versionFramework, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.versionFramework, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_help(form.versionFramework) }}
+                    {{ form_errors(form.versionFramework) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

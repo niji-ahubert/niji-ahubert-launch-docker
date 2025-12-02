@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% if EnumDisplay == 'App\\Enum\\ContainerType\\ServiceContainer' %}
+    {% set type = enum('App\\Enum\\TypeService').EXTERNAL.value %}
+    {% set hover = 'external_services' %}
+    {% set title = 'External Services' %}
+
+{% else %}
+    {% set type = enum('App\\Enum\\TypeService').PROJECT.value %}
+    {% set hover = 'project_services' %}
+    {% set title = ' Project Services' %}
+{% endif %}
+
+{% block title %}{{ 'client.list.title'|trans }}{% endblock %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <twig:Breadcrumb label="{{ client }}" path="{{ path('app_project_list_by_client', {'client': project.client}) }}"/>
+    <twig:Breadcrumb label="{{ project.project }}"
+                     path="{{ path('app_project_list_by_client', {'client': project.client}) }}"/>
+    <twig:Breadcrumb label="{{ title }}"/>
+{% endblock %}
+
+{% block body %}
+
+
+
+
+    <!-- Start block -->
+
+    {% include 'project/_buttons.html.twig' with {'project': project, 'hover': hover} %}
+    <twig:FlashMessage/>
+    <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+        <div class="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
+            <div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+                <a href="{{ path('app_project_external_services_action', {'client': project.client, 'project': project.project,'type': type }) }}"
+                   class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                    <i class="fas fa-plus"></i> {{ 'button.new_service'|trans }}
+                </a>
+                <a href="{{ path('app_project_list_by_client', {'client': project.client}) }}"
+                   class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">{{ 'form.back'|trans }}</a>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="p-4">{{ 'table.type'|trans }}</th>
+                    <th scope="col" class="p-4">{{ 'table.version'|trans }}</th>
+                    <th scope="col" class="p-4">{{ 'table.service_name'|trans }}</th>
+                    <th scope="col" class="p-4">{{ 'table.actions'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for service in project.serviceContainer %}
+                    {% if service.serviceContainer is instanceof(EnumDisplay) %}
+                        <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <td class="px-4 py-3">{{ service.serviceContainer.value }}</td>
+                            <td class="px-4 py-3">{{ service.dockerVersionService }}</td>
+
+                            <td class="px-4 py-3">
+                                {% if service.serviceContainer is instanceof('App\\Enum\\ContainerType\\ProjectContainer') %}
+                                    {{ service.folderName }}
+                                {% else %}
+                                    {{ service.dockerServiceName }}
+                                {% endif %}
+                            </td>
+
+                            <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                <div class="flex items-center space-x-4">
+                                    <a href="{{ path('app_project_external_services_action_edit', {'client': project.client, 'project': project.project, 'uuid': service.id ,'type': type}) }}"
+                                       class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> {{ 'button.edit'|trans }}
+                                    </a>
+                                    
+                                    <form action="{{ path('app_project_external_services_action_remove', {
+                                        'type': type,
+                                        'uuid':  service.id,
+                                        'client': project.client,
+                                        'project': project.project
+                                    }) }}" method="post">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete-service') }}">
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                                onclick="return confirm('{{ 'service.delete.confirm'|trans({'%service%':service.serviceContainer.value}) }}')">
+                                            <i class="fas fa-trash"></i> {{ 'button.delete'|trans }}
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

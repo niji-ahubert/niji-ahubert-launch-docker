@@ -1,0 +1,72 @@
+/tmp
+
+/node_modules/
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+/public/build/fonts/glyphicons-*
+/public/build/images/glyphicons-*
+
+.php-version
+
+###> symfony/framework-bundle ###
+.env
+/.env.local
+/.env.local.php
+/.env.*.local
+/.env.*
+!/.env.dist
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
+
+###> IDE ###
+.history
+/.vscode
+.idea
+###< IDE ###
+
+config/secrets/dev/dev.decrypt.private.php
+
+###> Custom Ignored Files ###
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Backups
+*~
+*.swp
+*.bak
+*.orig
+
+# Docker
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# Coverage
+/coverage/
+/html-coverage/
+clover.xml
+
+# Tools
+.rector-cache
+###< Custom Ignored Files ###

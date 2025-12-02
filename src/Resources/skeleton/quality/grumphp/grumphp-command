@@ -1,0 +1,6 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd "${DIR}/.." || exit;
+
+echo "" | XDEBUG_MODE=off docker compose exec -e XDEBUG_MODE -u 1000 -T -w /var/www/html app_php_dev "$@"

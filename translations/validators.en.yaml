@@ -1,0 +1,23 @@
+validator:
+  project:
+    already_exists: 'Le projet "{{ project }}" existe déjà pour le client "{{ client }}".'
+    service:
+      name:
+        already_exists: 'Le service "{{ value }}" est déjà utilisé dans le projet.'
+      version_framework:
+        invalid: 'La version du framework doit être compatible avec le framework choisi.'
+      version_service:
+        invalid: 'La version du service doit être une version {{ language }} valide.'
+  framework_language: "Le framework choisi doit être un framework {{ language }}"
+  framework_required_php: "Le framework est obligatoire pour PHP"
+  framework_required_node: "Le framework est obligatoire pour Node.js"
+  no_framework_allowed: "Aucun framework ne doit être sélectionné pour ce langage"
+  github_repository_format: "Le repository doit être une URL SSH Git valide (ex: git@github.com:organisation/repo.git)"
+  language_required: "Le langage est obligatoire"
+  version_service_required: "La version du service est obligatoire"
+  version_framework_required: "La version du framework est obligatoire quand un framework est sélectionné"
+  folder_name_required: "Le nom du dossier est obligatoire"
+  url_service_required: "L'URL du service est obligatoire"
+  url_service_docker_localhost: "L'URL du service doit se terminer par '.docker.localhost'"
+  webserver_required: "Le serveur web est obligatoire"
+  webserver_choice: "Le serveur web doit être local, apache ou nginx"

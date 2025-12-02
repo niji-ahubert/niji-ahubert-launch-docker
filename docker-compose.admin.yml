@@ -1,0 +1,127 @@
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK:-public-dev}
+  admin-backend:
+    driver: bridge
+    name: niji-generator-backend
+volumes:
+  composer-cache:
+  phpstan-cache:
+  rector-cache:
+  mercure_data:
+  mercure_config:
+# Configuration commune pour les services PHP
+x-php-common: &php-common
+  user: ${CURRENT_UID:-1000}
+  volumes:
+    - ./:/var/www/html:rw
+    - composer-cache:/composer-cache:rw
+    - ~/.ssh:/home/admin/.ssh:ro
+    - ~/.ssh/known_hosts:/home/admin/.ssh/known_hosts:rw
+    - ~/.ssh:/root/.ssh:ro
+    - ./resources/docker/php/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini:ro
+    - /var/run/docker.sock:/var/run/docker.sock:rw
+  working_dir: /var/www/html
+  group_add:
+    - ${DOCKER_GID:-997}
+
+# Configuration commune pour le build PHP
+x-php-build: &php-build
+  context: ./
+  args:
+    PHP_VERSION: ${PHP_VERSION:-8.3}
+
+services:
+  cli-php:
+    <<: *php-common
+    profiles: [ cliphp ]
+    build:
+      <<: *php-build
+      target: niji_generator_client
+
+  webserver-php:
+    <<: *php-common
+    profiles: [ webserver ]
+    container_name: niji-generator-webserver-php
+    user: "${HOST_UID:-1000}"
+    networks:
+      - admin-backend
+    build:
+      <<: *php-build
+      target: niji_generator_webserver
+    environment:
+      SYMFONY_LOCAL_SERVER: "false"
+      PHP_IDE_CONFIG: "serverName=webserver-php"
+      XDEBUG_TRIGGER: "PHPSTORM"
+      XDEBUG_CONFIG: "client_host=$IP_WSL_ETH"
+      XDEBUG_MODE: "debug"
+      HOST_UID: ${HOST_UID:-1000}
+      HOST_GID: ${HOST_GID:-1000}
+      PROJECT_ROOT: ${PROJECT_ROOT}
+      IP_WSL_ETH: ${IP_WSL_ETH}
+    restart: unless-stopped
+
+  mercure:
+    image: dunglas/mercure
+    profiles: [ webserver ]
+    container_name: niji-generator-mercure
+    restart: unless-stopped
+    networks:
+      - traefik
+      - admin-backend
+    environment:
+      SERVER_NAME: ':80'
+      MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+      MERCURE_EXTRA_DIRECTIVES: |
+        cors_origins https://niji-generator.docker.localhost
+        anonymous
+    volumes:
+      - mercure_data:/data
+      - mercure_config:/config
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mercure.rule=Host(`mercure.docker.localhost`)
+      - traefik.http.routers.mercure.tls=true
+      - traefik.http.services.mercure.loadbalancer.server.port=80
+      - traefik.docker.network=${TRAEFIK_NETWORK:-public-dev}
+  nginx:
+    image: nginx:1.25-alpine
+    profiles: [ webserver ]
+    container_name: niji-generator-nginx
+    volumes:
+      - ./:/var/www/html:ro
+      - ./resources/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - traefik
+      - admin-backend
+    depends_on:
+      - webserver-php
+    restart: unless-stopped
+    labels:
+      - traefik.http.routers.niji-generator-web.rule=Host(`niji-generator.docker.localhost`)
+      - traefik.enable=true
+      - traefik.http.services.niji-generator-web.loadbalancer.server.port=80
+      - traefik.http.routers.niji-generator-web.tls=true
+      - traefik.docker.network=${TRAEFIK_NETWORK:-public-dev}
+  build-php-dev:
+    image: socle-php-${PHP_VERSION}-${DOCKER_ENV}:latest
+    profiles: [ builder ]
+    build:
+      target: app_php_dev
+      context: ./
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.3}
+    environment:
+      URL_LOCAL_WEBSITE: ${URL_LOCAL_WEBSITE}
+  build-php-prod:
+    image: socle-php-${PHP_VERSION}-${DOCKER_ENV}:${TAG_VERSION:-1.0}
+    profiles: [ builder ]
+    build:
+      target: app_php_prod
+      context: ./
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.3}
+        PROJECT: ${PROJECT}
+        CLIENT: ${CLIENT}

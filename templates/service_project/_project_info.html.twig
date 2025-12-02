@@ -1,0 +1,27 @@
+<!-- Informations du projet -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">{{ 'form.project_info'|trans }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form_label(form.folderName, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.folderName, {'attr': {'class': 'form-control', 'required': true}}) }}
+                    {{ form_help(form.folderName) }}
+                    {{ form_errors(form.folderName) }}
+                    <small class="form-text text-muted">{{ 'form.folder_name'|trans }}</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form_label(form.githubRepository, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(form.githubRepository, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_help(form.githubRepository) }}
+                    {{ form_errors(form.githubRepository) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,313 @@
+# General messages
+welcome: "Welcome"
+hello: "Hello"
+goodbye: "Goodbye"
+
+# Navigation
+nav:
+  project_generator: "Project Generator"
+  project_list: "Project List"
+  new_project: "New Project"
+  language: "Language"
+
+# Languages
+language:
+  fr: "French"
+  en: "English"
+  current: "Current language"
+
+# Titles
+title:
+  project_generator: "Project Generator"
+  project_list: "Project List"
+  client_projects: "Projects for client %client%"
+  services: "Services"
+  edit_project_service: "Edit Project Service"
+  add_project_service: "Add Project Service"
+  client_add: "Add Client"
+  client_form: "Client Form"
+
+# Docker Logs
+docker:
+  action:
+    generate: "Generate Project"
+    build: "Build Images"
+    clear_logs: "Clear Logs"
+    start_project: "Start Project"
+    stop_project: "Stop Project"
+  logs:
+    title: "Docker Logs"
+    breadcrumb: "Docker Logs"
+    waiting: "Waiting for command to start..."
+    cleared: "Logs cleared"
+  command:
+    logs: "Show logs"
+    build: "Build images"
+    up: "Start services"
+    down: "Stop services"
+    ps: "List containers"
+    pull: "Pull images"
+    restart: "Restart services"
+  button:
+    start: "Start"
+    stop: "Stop"
+    run: "Run"
+    running: "Running..."
+    generate: "Generate Project"
+    generating: "Generating..."
+    building: "Building..."
+    clear: "Clear"
+    start_project: "Start Project"
+    starting: "Starting..."
+    stop_project: "Stop Project"
+    stopping: "Stopping..."
+    clearing: "Clearing..."
+  status:
+    connected: "Connected"
+    disconnected: "Disconnected"
+  project:
+    path: "Project path"
+
+# Buttons
+button:
+  new_project: "New Project"
+  new_client: "New Client"
+  back_to_clients: "Back to Client List"
+  back_to_project: "Back to Project"
+  back_to_services: "Back to Services"
+  configure: "Configure"
+  delete: "Delete"
+  close: "Close"
+  edit: "Edit"
+  cancel: "Cancel"
+  save: "Save"
+  add_service: "Add Service"
+  new_service: "New Service"
+  webserver_config: "Webserver Configuration"
+  modify_service: "Modify Service"
+  generate: "Generate Project"
+  clear: "Clear"
+
+# Client
+client:
+  list:
+    title: "Client List"
+  new_project: "New Project"
+  no_clients: "No clients have been created."
+  add:
+    title: "Add Client"
+    heading: "Create New Client"
+    back: "Back"
+  edit:
+    title: "Edit Client %client%"
+    heading: "Edit Client"
+    back: "Back"
+    submit: "Update Client"
+  form:
+    name:
+      label: "Client Name"
+      placeholder: "Enter client name (e.g. my-client-2024)"
+      help: "Client name will be used as folder name. Use only letters, numbers, hyphens and underscores (2-50 characters). Name must be unique."
+    submit:
+      label: "Create Client"
+  validation:
+    name:
+      not_blank: "Client name cannot be empty."
+      min_length: "Client name must contain at least {{ limit }} characters."
+      max_length: "Client name cannot exceed {{ limit }} characters."
+      invalid_characters: "Client name can only contain letters, numbers, hyphens (-) and underscores (_)."
+      reserved_name: "This name is reserved by the system and cannot be used."
+      invalid_folder_name: "This name cannot be used as a folder name."
+      dot_not_allowed: "Name cannot start or end with a dot."
+      empty_or_whitespace: "Name cannot be empty or contain only whitespace."
+      already_exists: "A client with the name {client} already exists."
+      filesystem_error: "Error checking name uniqueness. Please try again."
+  created:
+    success: "Client %client% has been created successfully."
+    name:
+      available: "The name {{ client_name }} is available."
+  create_new_project: "Create a new project"
+  label: "Client"
+  view_projects: "View projects"
+
+  update:
+    success: "Client {{ client_name }} has been updated successfully!"
+  delete:
+    confirm: "Are you sure you want to delete the client %client%?"
+    success: "Client {{ client_name }} has been deleted successfully!"
+    error: "An error occurred while deleting the client. Please try again."
+
+message:
+  no_projects: "No projects have been created"
+  no_client_projects: "No projects have been created for client {client}"
+  create_new_project: "Create a new project"
+  no_services: "No services configured"
+  add_new_service: "Add a new service"
+  confirm_delete: "Are you sure you want to delete the service {service}?"
+
+# Tables
+table:
+  client: "Client"
+  project: "Project"
+  traefik_network: "Traefik Network"
+  environment: "Environment"
+  services: "Services"
+  actions: "Actions"
+  type: "Type"
+  version: "Version"
+  service_name: "Service Name"
+
+# Common
+common:
+  actions: "Actions"
+
+# Forms
+form:
+  submit: "Submit"
+  cancel: "Cancel"
+  save: "Save"
+  delete: "Delete"
+  select_option: "Select an option"
+  select_or_enter_client: "Select or enter a client"
+  language_config: "Language Configuration"
+  project_info: "Project Information"
+  service_config: "Service Configuration"
+  required_extensions: "Required Extensions"
+  folder_name: "Folder Name"
+  webserver_choice: "Choose between local, apache or nginx"
+  github_repository: "GitHub Repository"
+  github_repository_help: "Use the SSH URL of the repository (e.g., git@github.com:organization/repo.git)"
+  github_branch: "Git Branch"
+  github_branch_help: "Name of the branch to clone (default: main)"
+  language: "Language"
+  select_language: "Choose a language"
+  version_service: "Language Version"
+  select_language_first: "Choose a language first"
+  framework: "Framework"
+  version_framework: "Framework Version"
+  select_framework_first: "Choose a framework first"
+  select_extensions: "Select extensions"
+  url_service: "Service URL"
+  url_service_help: "The URL must end with docker.localhost (e.g., my-service.docker.localhost)"
+  webserver: "Web Server"
+  select_webserver: "Choose a web server"
+  service_external:
+    title: "New External Service"
+    service_name: "External service"
+    service_name_placeholder: "Select a service"
+    version: "Service version"
+    version_placeholder: "Select a version"
+  create_new_project: "Create new project"
+  client: "Client"
+  project: "Project"
+  traefik_network: "Traefik Network"
+  environment: "Environment"
+  back: "Back"
+
+# Error messages
+error:
+  required: "This field is required"
+  invalid: "Invalid value"
+
+# Environments
+environment:
+  dev: "Development"
+  prod: "Production"
+
+# Web Servers
+webserver:
+  local: "Local"
+  apache: "Apache"
+  nginx: "Nginx"
+  update:
+    no_projects_affected: "No projects are using the deleted %webserver% webserver."
+    projects_updated: "%count% project(s) using the %webserver% webserver have been updated to 'local': %projects%"
+
+# Versions
+version:
+  php:
+    '8.3': "PHP 8.3"
+    '8.2': "PHP 8.2"
+    '8.1': "PHP 8.1"
+  mysql:
+    '9': "MySQL 9"
+    '8': "MySQL 8"
+  mariadb:
+    '11': "MariaDB 11"
+    '10': "MariaDB 10"
+  pgsql:
+    '17': "PostgreSQL 17"
+    '16': "PostgreSQL 16"
+  redis:
+    '7': "Redis 7"
+    '6': "Redis 6"
+  node:
+    '18': "Node.js 18"
+    '20': "Node.js 20"
+    '22': "Node.js 22"
+    '23': "Node.js 23"
+    '24': "Node.js 24"
+  laravel:
+    '11': "Laravel 11"
+    '10': "Laravel 10"
+  symfony:
+    '7.1': "Symfony 7.1"
+    '6.4': "Symfony 6.4"
+
+# Frameworks
+framework:
+  language:
+    php:
+      symfony: "Symfony"
+      laravel: "Laravel"
+      custom: "Custom PHP"
+    node:
+      react: "React"
+      javascript: "JavaScript"
+
+# Project
+project:
+  form:
+    new:
+      title: "New project"
+    modify:
+      title: "Project %project%"
+  delete:
+    confirm: 'Are you sure you want to delete the project %project%? This action is irreversible.'
+    success: 'Project %client% > %project% has been deleted successfully!' # success
+    error: 'An error occurred %error%'
+  flash:
+    created_successfully: 'Project created successfully!'
+    updated_successfully: 'Project updated successfully!'
+    not_found: 'Project not found!'
+
+flash:
+  error:
+    generic_update: 'An error occurred during the update!'
+    title: 'Error!'
+  success:
+    title: 'Success!'
+
+# Service
+service:
+  delete:
+    confirm: 'Are you sure you want to delete the service %service%?'
+  error:
+    already_exists: 'You already have a service of type "{{ type }}" in this project.'
+  success:
+    created: 'Service added successfully'
+    updated: 'Service updated successfully'
+    deleted: 'Service {{ service_name }} deleted successfully'
+
+# Validators
+validator:
+  service:
+    github_repository_format: "GitHub repository format is invalid. Use SSH format (e.g., git@github.com:organization/repo.git)"
+    github_branch_format: "Branch name can only contain letters, numbers, hyphens, underscores and slashes"
+    language_required: "Language is required"
+    version_required: "Version is required"
+    folder_name_required: "Folder name is required"
+    url_service_required: "Service URL is required"
+    url_service_docker_localhost: "Service URL must end with .docker.localhost"
+    webserver_required: "Web server is required"
+    webserver_choice: "Please choose a valid web server"

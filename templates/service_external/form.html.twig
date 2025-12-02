@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {% if form.vars.is_edit_mode is defined and form.vars.is_edit_mode %}
+        Modifier le service externe
+    {% else %}
+        Nouveau Service Externe
+    {% endif %}
+{% endblock %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <twig:Breadcrumb label="{{ project.client }}"
+                     path="{{ path('app_project_list_by_client', {'client': project.client}) }}"/>
+    <twig:Breadcrumb label="{{ project.project }}"
+                     path="{{ path('app_project_list_by_client', {'client': project.client}) }}"/>
+    <twig:Breadcrumb label="External Services"
+                     path="{{ path('app_project_services_list', {'client': project.client, 'project': project.project,'type': type}) }}"/>
+    <twig:Breadcrumb label="{{ lastBreadcrumb }}"/>
+{% endblock %}
+
+{% block body %}
+
+    {% include 'project/_buttons.html.twig' with {'project': project,'hover': 'external_services'} %}
+    <twig:FlashMessage/>
+
+    <turbo-frame id="service-external-form-frame" target="_top">
+        <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 mx-auto max-w-screen-2xl px-4 lg:px-12">
+
+                <div data-controller="service-external-form"
+                     data-service-external-form-is-edit-value="{{ (form.vars.is_edit_mode is defined and form.vars.is_edit_mode) ? 'true' : 'false' }}">
+
+                    {{ form_start(form, {
+                        'attr': {
+                            'novalidate': 'novalidate',
+                            'data-turbo-frame': 'service-external-form-frame'
+                        }
+                    }) }}
+
+                    <div class="mb-3 mt-6">
+                        <div class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {% if form.vars.is_edit_mode is defined and form.vars.is_edit_mode %}
+                                    Modifier le service externe
+                                {% else %}
+                                    {{ 'form.service_external.title'|trans }}
+                                {% endif %}
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.serviceName, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {% set select_attrs = {
+                            'class': 'text-gray-900 bg-gray-50 rounded-lg text-sm block w-full p-2.5 border border-gray-300 focus:z-10 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 form-control disabled:bg-gray-100 disabled:border-gray-300 disabled:cursor-not-allowed dark:disabled:text-gray-400',
+                            'data-service-external-form-target': 'serviceName'
+                        } %}
+                        {% if form.vars.is_edit_mode is defined and form.vars.is_edit_mode %}
+                            {% set select_attrs = select_attrs|merge({'disabled': 'disabled'}) %}
+                        {% endif %}
+                        {{ form_widget(form.serviceName, {'attr': select_attrs}) }}
+                        {{ form_help(form.serviceName) }}
+                        {{ form_errors(form.serviceName) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.version, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.version, {
+                            'attr': {
+                                'class': 'form-control',
+                                'data-service-external-form-target': 'version'
+                            }
+                        }) }}
+                        {{ form_help(form.version) }}
+                        {{ form_errors(form.version) }}
+                    </div>
+
+                    <div class="mb-6 mt-6">
+                        {{ form_widget(form.submit, {
+                            'attr': {
+                                'data-turbo-submits-with': 'Enregistrement...'
+                            }
+                        }) }}
+                        <a href="{{ path('app_project_services_list', {'client': project.client, 'project': project.project,'type': type}) }}"
+                           class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                           data-turbo-frame="_top">{{ 'form.back'|trans }}</a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </turbo-frame>
+{% endblock %}

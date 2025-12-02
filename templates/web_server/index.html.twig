@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Configuration du serveur web - {{ project.client }}/{{ project.project }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h1>Serveur Web <span class="text-primary">{{ project.client }}/{{ project.project }}</span></h1>
+            </div>
+            <div class="col-auto">
+                <a href="{{ path('app_project_edit', {'client': project.client, 'project': project.project}) }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour au projet
+                </a>
+            </div>
+            <!-- Navigation menu -->
+            <div class="row mb-4">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Sections</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex flex-column flex-md-row gap-2">
+                                <a href="{{ path('app_project_edit', {'client': project.client, 'project': project.project}) }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-project-diagram me-1"></i> Projet
+                                </a>
+                                <a href="{{ path('app_project_services', {'client': project.client, 'project': project.project}) }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-cogs me-1"></i> Services
+                                </a>
+                                <a href="{{ path('app_project_webserver', {'client': project.client, 'project': project.project}) }}" class="btn btn-primary">
+                                    <i class="fas fa-server me-1"></i> Serveur Web
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Services configurés</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if project.serviceContainer|length > 0 %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Version</th>
+                                            <th>Informations</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for service in project.serviceContainer %}
+                                            <tr>
+                                                <td>{{ service.type }}</td>
+                                                <td>{{ service.version }}</td>
+                                                <td>
+                                                    {% if service.type == 'mysql' or service.type == 'mariadb' or service.type == 'postgres' %}
+                                                        Base de données
+                                                    {% elseif service.type == 'redis' %}
+                                                        Cache
+                                                    {% else %}
+                                                        Service
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">Aucun service configuré</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col">
+                {{ form_start(form) }}
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Configuration</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ form_widget(form) }}
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

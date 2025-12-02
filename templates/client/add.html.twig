@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'client.add.title'|trans }}{% endblock %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <twig:Breadcrumb label="{{ 'client.add.title'|trans }}"/>
+{% endblock %}
+
+{% block body %}
+    <turbo-frame id="client-form-frame" target="_top">
+        {{ include('client/_form.html.twig', {'form': form}) }}
+    </turbo-frame>
+{% endblock %}

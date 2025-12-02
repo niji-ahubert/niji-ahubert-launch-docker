@@ -1,0 +1,156 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Projet{% endblock %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <twig:Breadcrumb label="{{ project.client }}"
+                     path="{{ path('app_project_list_by_client', {'client': project.client}) }}"/>
+    <twig:Breadcrumb label="{{ project.project }}"
+                     path="{{ path('app_project_list_by_client', {'client': project.client}) }}"/>
+    <twig:Breadcrumb label="Project Services"
+                     path="{{ path('app_project_services_list', {'client': project.client, 'project': project.project,'type': type}) }}"/>
+    <twig:Breadcrumb label="{{ lastBreadcrumb }}"/>
+{% endblock %}
+
+{% block body %}
+
+    {% include 'project/_buttons.html.twig' with {'project': project,'hover': 'project_services'} %}
+    <twig:FlashMessage/>
+
+    <turbo-frame id="service-project-form-frame" target="_top">
+        <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 mx-auto max-w-screen-2xl px-4 lg:px-12">
+
+                <div data-controller="service-project-form"
+                     data-service-project-form-client-value="{{ project.client }}"
+                     data-service-project-form-project-value="{{ project.project }}"
+                     data-service-project-form-is-edit-value="{{ lastBreadcrumb == 'edit' ? 'true' : 'false' }}">
+
+                    {{ form_start(form, {
+                        'attr': {
+                            'novalidate': 'novalidate',
+                            'class': lastBreadcrumb == 'edit' ? 'edit-mode' : 'create-mode',
+                            'data-turbo-frame': 'service-project-form-frame'
+                        }
+                    }) }}
+
+
+                    <div class="mb-3 mt-6">
+                        <div class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {{ 'form.language_config'|trans }}
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.language) }}
+                        {{ form_widget(form.language) }}
+                        {{ form_help(form.language) }}
+                        {{ form_errors(form.language) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.versionService) }}
+                        {{ form_widget(form.versionService) }}
+                        {{ form_help(form.versionService) }}
+                        {{ form_errors(form.versionService) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.extensionsRequired) }}
+                        {{ form_widget(form.extensionsRequired) }}
+                        {{ form_help(form.extensionsRequired) }}
+                        {{ form_errors(form.extensionsRequired) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.framework) }}
+                        {{ form_widget(form.framework) }}
+                        {{ form_help(form.framework) }}
+                        {{ form_errors(form.framework) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.versionFramework) }}
+                        {{ form_widget(form.versionFramework) }}
+                        {{ form_help(form.versionFramework) }}
+                        {{ form_errors(form.versionFramework) }}
+                    </div>
+
+                    <div class="mb-3 mt-6">
+                        <div class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {{ 'form.project_info'|trans }}
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.folderName) }}
+                        {{ form_widget(form.folderName) }}
+                        {{ form_help(form.folderName) }}
+                        {{ form_errors(form.folderName) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.githubRepository) }}
+                        {{ form_widget(form.githubRepository) }}
+                        {{ form_help(form.githubRepository) }}
+                        {{ form_errors(form.githubRepository) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.githubBranch) }}
+                        {{ form_widget(form.githubBranch) }}
+                        {{ form_help(form.githubBranch) }}
+                        {{ form_errors(form.githubBranch) }}
+                    </div>
+
+                    <div class="mb-3 mt-6">
+                        <div class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {{ 'form.service_config'|trans }}
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.urlService) }}
+                        {{ form_widget(form.urlService) }}
+                        {{ form_help(form.urlService) }}
+                        {{ form_errors(form.urlService) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.webServer) }}
+                        {{ form_widget(form.webServer) }}
+                        {{ form_help(form.webServer) }}
+                        {{ form_errors(form.webServer) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.dataStorages) }}
+                        {{ form_widget(form.dataStorages) }}
+                        {{ form_help(form.dataStorages) }}
+                        {{ form_errors(form.dataStorages) }}
+                    </div>
+
+                    <div class="mb-6 mt-6">
+                        {{ form_widget(form.submit, {
+                            'attr': {
+                                'data-turbo-submits-with': 'Enregistrement...'
+                            }
+                        }) }}
+                        <a href="{{ path('app_project_services_list', {'client': project.client, 'project': project.project,'type': type}) }}"
+                           class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                           data-turbo-frame="_top">{{ 'form.back'|trans }}</a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </turbo-frame>
+{% endblock %}

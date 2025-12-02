@@ -1,0 +1,71 @@
+<turbo-frame id="client-form-frame" target="_top">
+    <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 mx-auto max-w-screen-2xl px-4 lg:px-12">
+
+            <div class="mb-3 mt-6">
+                <div class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        {% if app.request.attributes.get('_route') == 'app_client_edit' %}
+                            {{ 'client.edit.heading'|trans }}
+                        {% else %}
+                            {{ 'client.add.heading'|trans }}
+                        {% endif %}
+                    </h3>
+                </div>
+            </div>
+
+            <div data-controller="client-form"
+                 data-client-form-original-name-value="{{ client_name|default('') }}">
+
+                {{ form_start(form, {
+                    'attr': {
+                        'novalidate': 'novalidate',
+                        'data-turbo-frame': 'client-form-frame'
+                    }
+                }) }}
+
+                <div class="mb-3 relative">
+                    {{ form_label(form.client, 'client.form.name.label'|trans, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_help(form.client) }}
+                    {{ form_widget(form.client, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'client.form.name.placeholder'|trans,
+                            'data-client-form-target': 'clientInput'
+                        }
+                    }) }}
+                    {{ form_errors(form.client) }}
+
+                    <!-- Message de disponibilité -->
+                    <div data-client-form-target="availabilityMessage"
+                         class="form-text"
+                         style="display: none;"></div>
+
+                    <!-- Container pour les suggestions -->
+                    <div data-client-form-target="suggestions"
+                         class="absolute w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg"
+                         style="display: none; z-index: 1000;"></div>
+                </div>
+
+                <div class="mb-6 mt-6">
+                    {{ form_widget(form.submit, {
+                        'attr': {
+                            'data-turbo-submits-with': 'Enregistrement...'
+                        }
+                    }) }}
+                    <a href="{{ path('app_client_list') }}"
+                       class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                       data-turbo-frame="_top">
+                        {% if app.request.attributes.get('_route') == 'app_client_edit' %}
+                            {{ 'client.edit.back'|trans }}
+                        {% else %}
+                            {{ 'client.add.back'|trans }}
+                        {% endif %}
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</turbo-frame>
