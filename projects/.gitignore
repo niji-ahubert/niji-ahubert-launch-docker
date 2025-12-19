@@ -3,3 +3,4 @@
 # Sauf les fichiers de configuration Git et le keep
 !.gitkeep
 !.gitignore
+/climbing
