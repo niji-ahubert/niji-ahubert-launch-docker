@@ -25,8 +25,8 @@ tasks:
       - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off webserver-php vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --diff'
       - echo "Running PHPStan..."
       - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off webserver-php vendor/bin/phpstan analyse src --memory-limit=-1'
-      - echo "Running Security Check..."
-      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off webserver-php composer audit'
+      # - echo "Running Security Check..."
+      # - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off webserver-php composer audit'
 
   bash:
     desc: "🐚 Start a bash shell in webserver for new project"

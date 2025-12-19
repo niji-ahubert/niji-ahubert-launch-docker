@@ -1,0 +1,5 @@
+# Ignorer tout le contenu du dossier projects
+*
+# Sauf les fichiers de configuration Git et le keep
+!.gitkeep
+!.gitignore
