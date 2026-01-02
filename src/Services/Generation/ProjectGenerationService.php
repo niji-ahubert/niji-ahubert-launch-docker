@@ -17,6 +17,7 @@ use App\Services\FileSystemEnvironmentServices;
 use App\Services\Mercure\MercureService;
 use App\Services\StrategyManager\CreateApplicationService;
 use App\Util\DockerUtility;
+use App\Services\Generation\TaskfileGenerationService;
 use Monolog\Level;
 
 final readonly class ProjectGenerationService
@@ -28,6 +29,7 @@ final readonly class ProjectGenerationService
         private FileSystemEnvironmentServices $fileSystemEnvironmentServices,
         private MercureService $mercureService,
         private StartProjectService $startProjectService,
+        private TaskfileGenerationService $taskfileGenerationService,
     ) {
     }
 
@@ -59,6 +61,7 @@ final readonly class ProjectGenerationService
             return;
         }
 
+
         $this->mercureService->dispatch(
             message: '📦 Création dossier logs',
         );
@@ -72,6 +75,25 @@ final readonly class ProjectGenerationService
         } catch (\Exception $exception) {
             $this->mercureService->dispatch(
                 message: '❌ Erreur lors de la création du dossier logs',
+                type: TypeLog::ERROR,
+                level: Level::Error,
+                error: $exception->getMessage(),
+            );
+        }
+
+        $this->mercureService->dispatch(
+            message: '📦 Création dossier bin',
+        );
+
+        try {
+            $this->fileSystemEnvironmentServices->createProjectBinFolder($project);
+
+            $this->mercureService->dispatch(
+                message: '✅ Création dossier bin généré avec succès',
+            );
+        } catch (\Exception $exception) {
+            $this->mercureService->dispatch(
+                message: '❌ Erreur lors de la création du dossier bin',
                 type: TypeLog::ERROR,
                 level: Level::Error,
                 error: $exception->getMessage(),
@@ -100,6 +122,8 @@ final readonly class ProjectGenerationService
         $this->executeCreateDockerService($project);
 
         $this->executeCreateApplicationService($project, DockerAction::BUILD);
+
+        $this->taskfileGenerationService->generate($project);
 
         $this->mercureService->dispatch(
             message: '🎉 Génération du projet terminée avec succès',

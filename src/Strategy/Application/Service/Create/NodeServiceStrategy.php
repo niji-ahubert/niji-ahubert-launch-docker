@@ -20,6 +20,7 @@ final readonly class NodeServiceStrategy extends AbstractServiceStrategy
     public function getSteps(): array
     {
         return [
+            ApplicationStep::INIT_GITIGNORE,
             ApplicationStep::NODE_INIT,
             ApplicationStep::NPM,
             ApplicationStep::ACCESS_RIGHT,

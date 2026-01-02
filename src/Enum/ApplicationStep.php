@@ -11,6 +11,7 @@ enum ApplicationStep: string
     case DOCKERFILE = 'dockerfile';
     case ENV_FILE = 'env_file';
     case ENV_FILE_APPLICATION = 'env_file_application';
+    case INIT_GITIGNORE = 'init_gitignore';
     case INIT_FOLDER_REPOSITORY = 'init_folder_repository';
     case GIT_CLONE = 'git_clone';
     case COMPOSER_INIT = 'composer_init';

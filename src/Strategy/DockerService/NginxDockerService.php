@@ -33,7 +33,7 @@ final readonly class NginxDockerService extends AbstractDockerService
             'container_name' => \sprintf('%s_service', ServiceContainer::NGINX->getValue()),
             'volumes' => [
                 \sprintf('%s:/data', $volumeName),
-                \sprintf('%s:/etc/nginx/conf.d/', str_replace(FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY, '${PROJECT_ROOT}/projects', $this->fileSystemEnvironmentServices->getProjectDockerFolderWebserver($project, WebServer::NGINX))),
+                \sprintf('%s:/etc/nginx/conf.d/', str_replace(FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY, '${PROJECTS_ROOT_HOST:-${PROJECT_ROOT}/projects}', $this->fileSystemEnvironmentServices->getProjectDockerFolderWebserver($project, WebServer::NGINX))),
                 ...$this->extractProjectVolume($project),
             ],
             'profiles' => ['runner-dev'],
@@ -65,7 +65,7 @@ final readonly class NginxDockerService extends AbstractDockerService
             if ($container->getServiceContainer() instanceof ServiceContainer) {
                 continue;
             }
-            $volumes[] = \sprintf('%s:%s', str_replace(FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY, '${PROJECT_ROOT}/projects', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $container)), $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $container));
+            $volumes[] = \sprintf('%s:%s', str_replace(FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY, '${PROJECTS_ROOT_HOST:-${PROJECT_ROOT}/projects}', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $container)), $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $container));
         }
 
         return $volumes;

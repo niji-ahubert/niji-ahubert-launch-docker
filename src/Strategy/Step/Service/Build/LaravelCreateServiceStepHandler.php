@@ -19,11 +19,20 @@ final class LaravelCreateServiceStepHandler extends AbstractBuildServiceStepHand
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
         MercureService $mercureService,
         ProcessRunnerService $processRunner,
-        private readonly string $hostUid,
-        private readonly string $hostGid,
-        private readonly string $projectRoot,
+        string $hostUid,
+        string $hostGid,
+        string $projectRoot,
+        string $projectsRootHost,
     ) {
-        parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
+        parent::__construct(
+            $fileSystemEnvironmentServices,
+            $mercureService,
+            $processRunner,
+            $hostUid,
+            $hostGid,
+            $projectRoot,
+            $projectsRootHost
+        );
     }
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
@@ -44,7 +53,7 @@ final class LaravelCreateServiceStepHandler extends AbstractBuildServiceStepHand
             'run',
             '--rm',
             '--user', \sprintf('%s:%s', $this->hostUid, $this->hostGid),
-            '--volume', \sprintf('%s:/app', str_replace('/var/www/html', $this->projectRoot, $applicationProjectPath)),
+            '--volume', \sprintf('%s:/app', $this->resolveHostPath($applicationProjectPath)),
             'composer',
             'create-project',
             'laravel/laravel',

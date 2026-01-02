@@ -20,7 +20,7 @@ final readonly class NodeDockerService extends AbstractDockerService
     {
         return [
             'extends' => [
-                'file' => \sprintf('../../../%s.docker-compose.yml', $service->getServiceContainer()->value),
+                'file' => \sprintf('${PROJECT_ROOT}/resources/docker-compose/%s.docker-compose.yml', $service->getServiceContainer()->value),
                 'service' => \sprintf('%s-%s', $service->getServiceContainer()->value, Environment::DEV->value),
             ],
         ];

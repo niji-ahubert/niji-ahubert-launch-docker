@@ -21,17 +21,23 @@ final class FileSystemEnvironmentServices
     public const string DOCKERFILE_NAME = 'LauncherDockerfile';
     public const string DOCKER_COMPOSE_FILE_NAME = 'launcher-docker-compose.yml';
 
-    public const string PROJECT_IN_GENERATOR_ROOT_DIRECTORY = '/var/www/html/projects';
+    public const string GENERATOR_ROOT_DIRECTORY = '/var/www/html';
+    public const string PROJECT_IN_GENERATOR_ROOT_DIRECTORY = self::GENERATOR_ROOT_DIRECTORY.'/projects';
     public const string NGINX_CONFIG_NAME = 'nginx.conf';
 
     public const string EXT_LOG = '.log';
     public const string  LOGS_FOLDER = 'logs';
     public const string  DOCKER_FOLDER = 'docker';
+    public const string  BIN_FOLDER = 'bin';
+    public const string  HEALTHCHECK_TRAEFIK_SH = 'healthcheckTraefik.sh';
     public const string SRC_RESOURCES_SKELETON = 'src/Resources/skeleton';
 
     public const string SRC_RESOURCES_SKELETON_DOCKERFILE = self::SRC_RESOURCES_SKELETON.'/dockerfile';
     public const string BIN_ENTRYPOINT_ADDON_SH = 'bin/entrypoint-addon.sh';
     private const string   LOG_FILE_PATTERN = '%s'.self::EXT_LOG;
+    public const GITKEEP = '.gitkeep';
+    public const GITIGNORE = '.gitignore';
+    private const TASKFILE_NAME = 'Taskfile.yml';
     private readonly Finder $finder;
     private ?string $pathProject = null;
 
@@ -118,9 +124,28 @@ final class FileSystemEnvironmentServices
         return \sprintf('%s/%s', self::PROJECT_IN_GENERATOR_ROOT_DIRECTORY, $clientName);
     }
 
+    public function getRootProjectsPath(): string
+    {
+        return self::PROJECT_IN_GENERATOR_ROOT_DIRECTORY;
+    }
+
     public function createProjectLogsFolder(Project $project): void
     {
-        $this->filesystem->mkdir(\sprintf('%s/%s', $this->getPathProject($project), self::LOGS_FOLDER));
+        $logsPath = \sprintf('%s/%s', $this->getPathProject($project), self::LOGS_FOLDER);
+        $this->filesystem->mkdir($logsPath);
+        $this->addGitIgnoreAndKeep($logsPath);
+    }
+
+    public function createProjectBinFolder(Project $project): void
+    {
+        $binPath = \sprintf('%s/%s', $this->getPathProject($project), self::BIN_FOLDER);
+        $this->filesystem->mkdir($binPath);
+
+        $sourceFile = \sprintf('%s/%s/%s', $this->projectDir, self::BIN_FOLDER, self::HEALTHCHECK_TRAEFIK_SH);
+        $destinationFile = \sprintf('%s/%s', $binPath, self::HEALTHCHECK_TRAEFIK_SH);
+
+        $this->filesystem->copy($sourceFile, $destinationFile);
+        $this->filesystem->chmod($destinationFile, 0755);
     }
 
     public function createProjectDockerFolder(Project $project): void
@@ -335,6 +360,31 @@ final class FileSystemEnvironmentServices
     public function getSkeletonFile(string $filename): string
     {
         return \sprintf('%s/%s/%s', $this->projectDir, self::SRC_RESOURCES_SKELETON, $filename);
+    }
+
+    public function getTaskFileSkeletonFile(): string
+    {
+        return \sprintf('%s/resources/%s', $this->projectDir, self::TASKFILE_NAME);
+    }
+
+    public function getProjectTaskFilePath(Project $project): string
+    {
+        return \sprintf('%s/%s', $this->getPathProject($project), self::TASKFILE_NAME);
+    }
+
+    public function addGitIgnoreAndKeep(string $folderPath): void
+    {
+        $gitIgnoreContent = <<<'EOF'
+# Ignorer tout le contenu du dossier
+*
+# Sauf les fichiers de configuration Git et le keep
+!.gitkeep
+!.gitignore
+
+EOF;
+
+        $this->filesystem->dumpFile(\sprintf('%s/%s', $folderPath,self::GITKEEP), '');
+        $this->filesystem->dumpFile(\sprintf('%s/%s', $folderPath,self::GITIGNORE), $gitIgnoreContent);
     }
 
     private function initializePathProject(Project $projectEnvironment): void

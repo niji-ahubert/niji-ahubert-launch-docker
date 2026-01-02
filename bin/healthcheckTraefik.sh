@@ -1,6 +1,5 @@
 #!/bin/bash
-source bin/library/library.sh
-source bin/library/gum.sh
+
 
 IS_RUNNING=$(docker --log-level=ERROR compose --project-name docker-traefik-portainer ps -q --status=running traefik2)
 if [[ "$IS_RUNNING" == "" ]]; then

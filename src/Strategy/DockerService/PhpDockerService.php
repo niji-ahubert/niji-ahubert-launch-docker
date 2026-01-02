@@ -20,11 +20,12 @@ final readonly class PhpDockerService extends AbstractDockerService
      */
     public function __construct(
         #[AutowireIterator('app.docker_service')]
-        private iterable $dockerServices,
-        DockerComposeFile $dockerComposeFile,
-        Generator $makerGenerator,
+        private iterable              $dockerServices,
+        DockerComposeFile             $dockerComposeFile,
+        Generator                     $makerGenerator,
         FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-    ) {
+    )
+    {
         parent::__construct($dockerComposeFile, $makerGenerator, $fileSystemEnvironmentServices);
     }
 
@@ -35,21 +36,52 @@ final readonly class PhpDockerService extends AbstractDockerService
 
     protected function getServiceSkeleton(string $volumeName, AbstractContainer $service, Project $project): array
     {
+/*
+     labels:
+      - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}.rule=Host(`${URL_LOCAL_WEBSITE}`)
+      - traefik.enable=true
+      - traefik.http.services.${CLIENT}-${PROJECT}${FOLDER_NAME}.loadbalancer.server.port=${PORT_NUMBER:-9000}
+      - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}.tls=true
+ */
         $configPhp = [
+            'container_name' => sprintf('%s-%s-%s-%s', $project->getClient(), $project->getProject(), $service->getFolderName(), $project->getEnvironmentContainer()->value),
+            'image' => sprintf('%s-%s-%s-%s', $project->getClient(), $project->getProject(), $service->getFolderName(), $project->getEnvironmentContainer()->value),
             'extends' => [
-                'file' => \sprintf('../../../resources/docker-compose/%s.docker-compose.yml', $service->getServiceContainer()->value),
+                'file' => \sprintf('${PROJECT_ROOT}/resources/docker-compose/%s.docker-compose.yml', $service->getServiceContainer()->value),
                 'service' => \sprintf('%s-%s', $service->getServiceContainer()->value, $project->getEnvironmentContainer()->value),
             ],
+            'env_file' => [
+                sprintf('./config/%s.env', $service->getFolderName()),
+                sprintf('./%s/.env.niji-launcher', $service->getFolderName())
+            ],
+            'build' => [
+                'context' => sprintf('${PROJECTS_ROOT_CONTEXT:-${PROJECT_ROOT}/projects}/%1$s/%2$s/%3$s', $project->getClient(), $project->getProject(), $service->getFolderName())
+            ],
+            'volumes' => [
+                sprintf(
+                    '${PROJECTS_ROOT_HOST:-${PROJECT_ROOT}/projects}/%1$s/%2$s/%3$s:/var/www/html/projects/%1$s/%2$s/%3$s:rw',
+                    $project->getClient(),
+                    $project->getProject(),
+                    $service->getFolderName()
+                )
+            ],
+            'labels' => [
+                sprintf('traefik.http.routers.${CLIENT}-${PROJECT}-%s.rule=Host(`${URL_LOCAL_WEBSITE}`)',$service->getFolderName()),
+                sprintf('traefik.http.services.${CLIENT}-${PROJECT}-%s.loadbalancer.server.port=${PORT_NUMBER:-9000}', $service->getFolderName()),
+                sprintf('traefik.http.routers.${CLIENT}-${PROJECT}-%s.tls=true', $service->getFolderName()),
+            ]
         ];
 
         if ($service->getWebServer() instanceof \App\Model\Service\WebServer && WebServer::LOCAL !== $service->getWebServer()->getWebServer()) {
-            $configPhp['labels'] = ['traefik.enable=false']; // si le webserver est ds un autre container on desactive treafik
+            $configPhp['labels'][] = 'traefik.enable=false'; // si le webserver est ds un autre container on desactive treafik
+        }else{
+            $configPhp['labels'][] = 'traefik.enable=true';
         }
 
         $dependsOn = [];
         if (!\in_array($service->getDataStorages(), [null, []], true)) {
             $dataStorageValues = array_map(
-                fn ($ds) => $ds->value,
+                static fn($ds) => $ds->value,
                 $service->getDataStorages(),
             );
 

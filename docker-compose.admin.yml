@@ -15,6 +15,7 @@ x-php-common: &php-common
   user: ${CURRENT_UID:-1000}
   volumes:
     - ./:/var/www/html:rw
+    - ${PROJECTS_ROOT_HOST:-./projects}:/var/www/html/projects:rw
     - composer-cache:/composer-cache:rw
     - ~/.ssh:/home/admin/.ssh:ro
     - ~/.ssh/known_hosts:/home/admin/.ssh/known_hosts:rw
@@ -29,9 +30,10 @@ x-php-common: &php-common
 x-php-build: &php-build
   context: ./
   args:
-    PHP_VERSION: ${PHP_VERSION:-8.3}
+    PHP_VERSION: ${PHP_VERSION:-8.5}
 
 services:
+  #CLI VERSION NOT UP TO DATE
   cli-php:
     <<: *php-common
     profiles: [ cliphp ]
@@ -58,6 +60,8 @@ services:
       HOST_UID: ${HOST_UID:-1000}
       HOST_GID: ${HOST_GID:-1000}
       PROJECT_ROOT: ${PROJECT_ROOT}
+      PROJECTS_ROOT_HOST: ${PROJECTS_ROOT_HOST:-./projects}
+      PROJECTS_ROOT_CONTEXT: /var/www/html/projects
       IP_WSL_ETH: ${IP_WSL_ETH}
     restart: unless-stopped
 
@@ -85,6 +89,13 @@ services:
       - traefik.http.routers.mercure.tls=true
       - traefik.http.services.mercure.loadbalancer.server.port=80
       - traefik.docker.network=${TRAEFIK_NETWORK:-public-dev}
+  security:
+    container_name: niji-generator-security
+    image: aquasec/trivy:latest
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - ${HOME}/.trivy/.cache:/root/.cache/
   nginx:
     image: nginx:1.25-alpine
     profiles: [ webserver ]
@@ -104,6 +115,7 @@ services:
       - traefik.http.services.niji-generator-web.loadbalancer.server.port=80
       - traefik.http.routers.niji-generator-web.tls=true
       - traefik.docker.network=${TRAEFIK_NETWORK:-public-dev}
+  #use to build project created DO NOT DELETE
   build-php-dev:
     image: socle-php-${PHP_VERSION}-${DOCKER_ENV}:latest
     profiles: [ builder ]

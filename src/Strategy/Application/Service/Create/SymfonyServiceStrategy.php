@@ -21,6 +21,7 @@ final readonly class SymfonyServiceStrategy extends AbstractServiceStrategy
     public function getSteps(): array
     {
         return [
+            ApplicationStep::INIT_GITIGNORE,
             ApplicationStep::GIT_CLONE,
             ApplicationStep::INIT_FOLDER_REPOSITORY,
             ApplicationStep::SYMFONY_CREATE,

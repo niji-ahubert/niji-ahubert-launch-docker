@@ -1,0 +1,79 @@
+version: '3'
+dotenv: ['.env']
+
+env:
+  PROJECTS_ROOT_CONTEXT: "{{PROJECTS_ROOT_CONTEXT}}"
+  PROJECT_ROOT: "{{PROJECT_ROOT}}"
+  CLIENT: "{{CLIENT}}"
+  PROJECT: "{{PROJECT}}"
+
+vars:
+  CONTAINER: '{{default "webserver-php" .CONTAINER}}'
+  PROJECT_ROOT:
+    sh: 'pwd'
+  DOCKER_GID:
+    sh: 'getent group docker | cut -d: -f3'
+  DOCKER_COMP: docker --log-level=ERROR compose --project-name generator-socle
+  DOCKER_EXEC: '{{.DOCKER_COMP}} exec'
+  DOCKER_ADMIN_COMP: docker --log-level=ERROR compose -f launcher-docker-compose.yml --profile runner-dev
+  ENV_IP_WSL_ETH:
+    sh: printenv IP_WSL_ETH
+tasks:
+
+
+  qa:
+    desc: "🔍 Run quality assurance tools"
+    cmds:
+      - echo "Running Rector..."
+      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.CONTAINER}} vendor/bin/rector process --config rector.php'
+      - echo "Running PHP-CS-Fixer..."
+      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.CONTAINER}} vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --diff'
+      - echo "Running PHPStan..."
+      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.CONTAINER}} vendor/bin/phpstan analyse src --memory-limit=-1'
+      # - echo "Running Security Check..."
+      # - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.CONTAINER}} composer audit'
+
+  bash:
+    desc: "🐚 Start a bash shell in webserver for new project"
+    silent: true
+    cmds:
+      - '{{.DOCKER_ADMIN_COMP}} exec {{.CONTAINER}} bash'
+
+
+  default:
+    desc: "Show help message"
+    silent: true
+    cmds:
+      - task --list
+
+  start:
+    desc: "🚀 Start webserver for new project development"
+    silent: true
+    deps:
+      - traefik_up
+      - stop
+    cmds:
+      - echo "🚀 Start webserver for new project development"
+      - '{{.DOCKER_ADMIN_COMP}} --project-name <?= $project_name ?> up -d'
+
+  stop:
+    desc: "⏹️ Stop the docker-compose stack for new project"
+    silent: true
+    cmds:
+      - echo "⏹️ Stop the docker-compose stack for new project"
+      - '{{.DOCKER_ADMIN_COMP}} down --remove-orphans'
+
+  check_permissions:
+    desc: "Ensure bin/healthcheckTraefik.sh is executable"
+    silent: true
+    cmds:
+      - 'if [ ! -x bin/healthcheckTraefik.sh ]; then sudo chmod +x bin/healthcheckTraefik.sh; fi'
+
+  traefik_up:
+    desc: "🌐 Start and check Traefik health"
+    internal: true
+    silent: true
+    deps:
+      - check_permissions
+    cmds:
+      - ./bin/healthcheckTraefik.sh

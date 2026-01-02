@@ -140,11 +140,14 @@ final readonly class BuildImageProjectService
             $serviceName,
         ];
 
+        $env = EnvVarUtility::loadEnvironmentVariables($this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service));
+        $env['PROJECT_ROOT'] = '/var/www/html';
+
         $this->processRunnerService->run(
             $command,
             \sprintf('Build image %s', $serviceName),
             $this->projectDir,
-            env: EnvVarUtility::loadEnvironmentVariables($this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service)),
+            env: $env,
         );
     }
 

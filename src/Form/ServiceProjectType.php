@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Form;
 
 use App\Enum\ContainerType\ProjectContainer;
+use App\Enum\DataStorage;
 use App\Enum\Framework\FrameworkLanguageInterface;
 use App\Enum\Framework\FrameworkLanguageNode;
 use App\Enum\Framework\FrameworkLanguagePhp;
@@ -27,14 +28,17 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @extends AbstractType<array<string, mixed>>
  */
 class ServiceProjectType extends AbstractType
 {
-    public function __construct(private readonly AvailableServicesProvider $availableServicesProvider)
-    {
+    public function __construct(
+        private readonly AvailableServicesProvider $availableServicesProvider,
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -265,14 +269,15 @@ class ServiceProjectType extends AbstractType
     private function addDataStorageField(FormInterface $form, Project $project): void
     {
         $availableStorages = $this->availableServicesProvider->getAvailableDataStorages($project);
-        $choices = $this->availableServicesProvider->formatAsChoices($availableStorages);
 
-        $form->add('dataStorages', ChoiceType::class, [
+        $form->add('dataStorages', EnumType::class, [
+            'class' => DataStorage::class,
             'required' => false,
             'label' => 'form.data_storages',
             'multiple' => true,
             'expanded' => true,
-            'choices' => $choices,
+            'choices' => $availableStorages,
+            'choice_label' => fn (DataStorage $choice): string => $choice->trans($this->translator),
             'row_attr' => [
                 'class' => 'data-storages-checkboxes',
             ],

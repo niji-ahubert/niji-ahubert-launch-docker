@@ -21,6 +21,7 @@ final readonly class PhpServiceStrategy extends AbstractServiceStrategy
     public function getSteps(): array
     {
         return [
+            ApplicationStep::INIT_GITIGNORE,
             ApplicationStep::COMPOSER_INIT,
             ApplicationStep::COMPOSER,
             ApplicationStep::ACCESS_RIGHT,

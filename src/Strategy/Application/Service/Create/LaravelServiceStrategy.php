@@ -24,6 +24,7 @@ final readonly class LaravelServiceStrategy extends AbstractServiceStrategy
     public function getSteps(): array
     {
         return [
+            ApplicationStep::INIT_GITIGNORE,
             ApplicationStep::INIT_FOLDER_REPOSITORY,
             ApplicationStep::GIT_CLONE,
             ApplicationStep::LARAVEL_CREATE,

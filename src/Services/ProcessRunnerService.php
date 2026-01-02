@@ -94,7 +94,7 @@ final readonly class ProcessRunnerService
      */
     private function determineLogLevel(mixed $type, string $message): Level
     {
-        if (Process::ERR === $type || str_contains($message, 'level=error')) {
+        if (str_contains($message, 'level=error')) {
             return Level::Error;
         }
 
@@ -104,6 +104,21 @@ final readonly class ProcessRunnerService
 
         if (str_contains($message, 'level=debug')) {
             return Level::Debug;
+        }
+
+        if (Process::ERR === $type) {
+            // Docker Compose outputte les événements de cycle de vie dans stderr (ex: "Container ... Created")
+            // On les traite comme INFO sauf s'ils contiennent des indicateurs d'erreur explicites.
+            $cleanMessage = trim($message);
+            if (preg_match('/^(Container|Network|Volume)\s+.*?\s+(Creating|Created|Starting|Started|Stopping|Stopped|Removing|Removed|Recreating|Recreated|Running|Waiting)$/i', $cleanMessage)) {
+                return Level::Info;
+            }
+
+            if (str_starts_with($cleanMessage, 'Attaching to')) {
+                return Level::Info;
+            }
+
+            return Level::Error;
         }
 
         return Level::Info;

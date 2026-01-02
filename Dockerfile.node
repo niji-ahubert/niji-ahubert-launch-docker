@@ -1,0 +1,103 @@
+
+# -----------------------------------------------------------------------------
+# DOCKERFILE NODE.JS
+# Basé sur la logique des layers dev/prod du Dockerfile PHP existant.
+# Image de base : Official Node.js (Secure/Slim -> compatible HDI/Distroless philosophy)
+# Utilisation de PNPM pour la gestion des paquets (Performance & Espace disque)
+# -----------------------------------------------------------------------------
+
+ARG NODE_VERSION=20
+# On utilise bookworm-slim pour une image Debian minimale et sécurisée.
+FROM node:${NODE_VERSION}-bookworm-slim AS node_base
+
+# Arguments pour l'utilisateur host (pour matcher les permissions fichiers)
+ARG HOST_UID=1000
+ARG HOST_GID=1000
+
+ENV DOCKER_ENV="prod"
+# Activation de Corepack pour gérer pnpm/yarn sans install globale manuelle
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+# Installation de tini pour la gestion des signaux (PID 1)
+# et des certificats CA à jour.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tini \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Création/Ajustement de l'utilisateur pour correspondre à l'hôte
+RUN set -x ; \
+    groupmod -g ${HOST_GID} node || true ; \
+    usermod -u ${HOST_UID} -g ${HOST_GID} node || true ; \
+    mkdir -p /app && chown -R node:node /app
+
+COPY resources/docker/entrypoint/docker-entrypoint-node.sh /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+
+WORKDIR /app
+ENTRYPOINT ["/usr/bin/tini", "--", "docker-entrypoint"]
+
+# -----------------------------------------------------------------------------
+# LAYER BUILDER
+# -----------------------------------------------------------------------------
+FROM node_base AS node_builder
+
+# On s'assure d'être en mode development pour installer toutes les dépendances (build tools)
+ENV NODE_ENV=development
+
+# Copie de l'application (le context de build est déjà dans le dossier de l'app)
+COPY --chown=node:node . /app
+
+USER node
+
+# 1. Installation complète (frozen-lockfile)
+RUN pnpm install --frozen-lockfile
+
+# 2. Passage en mode production pour que le build produise des assets optimisés
+ENV NODE_ENV=production
+
+# 3. Build de l'application (supporte tout framework via scripts npm)
+RUN pnpm run build --if-present
+
+# 4. Nettoyage : suppression des dépendances de dev
+RUN pnpm prune --prod
+
+# -----------------------------------------------------------------------------
+# LAYER PROD
+# -----------------------------------------------------------------------------
+FROM node_base AS node_prod
+
+ENV NODE_ENV=production
+
+# Copie de l'application "prête" depuis le builder
+COPY --from=node_builder --chown=node:node /app /app
+
+USER node
+
+# Commande par défaut
+CMD ["pnpm", "start"]
+
+# -----------------------------------------------------------------------------
+# LAYER DEV
+# -----------------------------------------------------------------------------
+FROM node_base AS node_dev
+
+ENV DOCKER_ENV="dev"
+ENV NODE_ENV=development
+
+# Installation d'outils utilitaires pour le développement
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    procps \
+    vim \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+USER node
+
+# En dev, on attend généralement que le volume soit monté et que l'utilisateur lance l'install si besoin,
+# ou on peut automatiser l'install au démarrage via un entrypoint custom.
+# Ici on garde la commande standard.
+CMD ["pnpm", "run", "dev"]

@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 ARG PHP_VERSION=8.3
 ARG COMPOSER_VERSION=lts
 
@@ -25,20 +26,21 @@ ARG HOST_GID=1000
 
 # Création du groupe et de l'utilisateur avec les UID/GID de l'hôte
 RUN set -x ; \
-  groupadd -g ${HOST_GID} admin ; \
-  useradd -u ${HOST_UID} -g admin -m admin;
+    groupadd -g ${HOST_GID} admin ; \
+    useradd -u ${HOST_UID} -g admin -G www-data -m admin;
 
 ## PACKAGE DEBIAN
-RUN set -eux; \
-apt-get update && apt-get install -y \
-bash \
-git \
-autoconf \
-pkg-config \
-build-essential \
-gcc \
-unzip \
-&& rm -rf /var/lib/apt/lists/*;
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    --mount=type=cache,target=/var/cache/apt/archives \
+    set -eux; \
+    apt-get update && apt-get install -y \
+    bash \
+    git \
+    autoconf \
+    pkg-config \
+    build-essential \
+    gcc \
+    unzip;
 ## END PACKAGE DEBIAN
 
 ## INSTALL COMMON PACKAGE
@@ -68,10 +70,10 @@ COPY resources/docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 #Add user & composer folder
 RUN set -x ; \
-  mkdir -p /composer; \
-  mkdir -p /composer-cache; \
-  chown -R 1000:www-data /composer; \
-  chown -R 1000:www-data /composer-cache;
+    mkdir -p /composer; \
+    mkdir -p /composer-cache; \
+    chown -R ${HOST_UID}:www-data /composer; \
+    chown -R ${HOST_UID}:www-data /composer-cache;
 
 ## COMPOSER
 ENV COMPOSER_HOME /composer
@@ -111,14 +113,17 @@ ENV INSTALL_QUALITY_TOOLS true
 
 
 ## ADD SSH
-RUN apt-get update && apt-get install -y openssh-client \
-    && rm -rf /var/lib/apt/lists/*
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    --mount=type=cache,target=/var/cache/apt/archives \
+    apt-get update && apt-get install -y openssh-client
 ## END ADD SSH
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 ## XDEBUG
-RUN apt-get update && apt-get install -y ${PHPIZE_DEPS} linux-headers-amd64 \
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    --mount=type=cache,target=/var/cache/apt/archives \
+    apt-get update && apt-get install -y ${PHPIZE_DEPS} linux-headers-amd64 \
     && install-php-extensions xdebug
 ## END XDEBUG
 
@@ -135,12 +140,11 @@ ENTRYPOINT ["docker-entrypoint"]
 FROM app_php_dev_xdebug AS niji_generator_common
 
 # Configuration des permissions
-RUN mkdir -p /opt/envfile /var/www/html /composer-cache && \
-    chown -R admin:admin /opt/envfile /var/www/html /composer-cache
+RUN mkdir -p /opt/envfile /var/www/html && \
+    chown -R admin:admin /opt/envfile /var/www/html
 
 # Configuration de l'environnement
 ENV COMPOSER_HOME=/home/admin/.composer
-ENV COMPOSER_CACHE_DIR=/composer-cache
 ENV DOCKER_GID=997
 
 WORKDIR /opt/envfile
@@ -159,15 +163,12 @@ RUN chmod +x /usr/local/libexec/docker/cli-plugins/docker-compose
 # Configuration des permissions Docker avec GID dynamique
 # Le GID doit correspondre au groupe docker de l'hôte pour éviter les erreurs de permissions
 ARG DOCKER_GID=997
-RUN (groupadd -g ${DOCKER_GID} docker 2>/dev/null || true) && \
-    usermod -aG ${DOCKER_GID} admin
-
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
-
-RUN rm -rf /var/lib/apt/lists/* \
-    && groupadd -f -g $DOCKER_GID docker \
-    && usermod -aG $DOCKER_GID admin \
-    && usermod -aG $DOCKER_GID www-data
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    --mount=type=cache,target=/var/cache/apt/archives \
+    apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && groupadd -f -g ${DOCKER_GID} docker \
+    && usermod -aG ${DOCKER_GID} admin \
+    && usermod -aG ${DOCKER_GID} www-data
 
 
 
@@ -180,10 +181,3 @@ CMD ["php", "-a"]
 FROM niji_generator_common AS niji_generator_webserver
 
 CMD ["php-fpm"]
-
-FROM node:22.15.0-slim AS node
-
-# Verify installation
-RUN node --version && npm --version
-
-WORKDIR /app
