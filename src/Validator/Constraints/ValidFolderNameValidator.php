@@ -89,13 +89,7 @@ class ValidFolderNameValidator extends ConstraintValidator
      */
     private function containsForbiddenCharacters(string $value): bool
     {
-        foreach (self::FORBIDDEN_CHARACTERS as $char) {
-            if (str_contains($value, $char)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::FORBIDDEN_CHARACTERS, fn ($char): bool => str_contains($value, (string) $char));
     }
 
     /**
@@ -105,13 +99,7 @@ class ValidFolderNameValidator extends ConstraintValidator
     {
         $upperValue = strtoupper($value);
 
-        foreach (self::RESERVED_NAMES as $reserved) {
-            if ($upperValue === $reserved || str_starts_with($upperValue, $reserved.'.')) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::RESERVED_NAMES, fn ($reserved): bool => $upperValue === $reserved || str_starts_with($upperValue, $reserved.'.'));
     }
 
     /**

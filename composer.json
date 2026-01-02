@@ -35,7 +35,7 @@
     "symfony/ux-twig-component": "^2.24",
     "symfony/validator": "8.0.*",
     "symfony/yaml": "8.0.*",
-    "tales-from-a-dev/flowbite-bundle": "^0.9.2",
+    "tales-from-a-dev/flowbite-bundle": "^1.0",
     "twig/extra-bundle": "^2.12|^3.0",
     "twig/twig": "^2.12|^3.0"
   },

@@ -16,6 +16,7 @@ use Webmozart\Assert\Assert;
 final class MercureService
 {
     public const string MERCURE_TOPIC = 'chat';
+
     public const string TARGET_ID = 'messages';
     private ?Project $project = null;
     private ?LoggerChannel $loggerChannel = null;

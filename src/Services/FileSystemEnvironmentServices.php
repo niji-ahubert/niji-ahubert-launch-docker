@@ -11,33 +11,49 @@ use App\Model\Service\AbstractContainer;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 final class FileSystemEnvironmentServices
 {
     public const string  CONFIG_FOLDER = 'config';
+
     public const string  SOCLE_ENV = 'socle.json';
+
     public const string DOCKERFILE_NAME = 'LauncherDockerfile';
+
     public const string DOCKER_COMPOSE_FILE_NAME = 'launcher-docker-compose.yml';
 
     public const string GENERATOR_ROOT_DIRECTORY = '/var/www/html';
+
     public const string PROJECT_IN_GENERATOR_ROOT_DIRECTORY = self::GENERATOR_ROOT_DIRECTORY.'/projects';
+
     public const string NGINX_CONFIG_NAME = 'nginx.conf';
 
     public const string EXT_LOG = '.log';
+
     public const string  LOGS_FOLDER = 'logs';
+
     public const string  DOCKER_FOLDER = 'docker';
+
     public const string  BIN_FOLDER = 'bin';
+
     public const string  HEALTHCHECK_TRAEFIK_SH = 'healthcheckTraefik.sh';
+
     public const string SRC_RESOURCES_SKELETON = 'src/Resources/skeleton';
 
     public const string SRC_RESOURCES_SKELETON_DOCKERFILE = self::SRC_RESOURCES_SKELETON.'/dockerfile';
+
     public const string BIN_ENTRYPOINT_ADDON_SH = 'bin/entrypoint-addon.sh';
+
+    public const string GITKEEP = '.gitkeep';
+
+    public const string GITIGNORE = '.gitignore';
+
     private const string   LOG_FILE_PATTERN = '%s'.self::EXT_LOG;
-    public const GITKEEP = '.gitkeep';
-    public const GITIGNORE = '.gitignore';
-    private const TASKFILE_NAME = 'Taskfile.yml';
+
+    private const string TASKFILE_NAME = 'Taskfile.yml';
     private readonly Finder $finder;
     private ?string $pathProject = null;
 
@@ -78,7 +94,7 @@ final class FileSystemEnvironmentServices
         }
 
         return array_map(
-            static fn ($dir) => $dir->getBasename(),
+            static fn (SplFileInfo $dir) => $dir->getBasename(),
             iterator_to_array($this->finder->directories()->in($directory)->depth(0)),
         );
     }
@@ -383,8 +399,8 @@ final class FileSystemEnvironmentServices
 
 EOF;
 
-        $this->filesystem->dumpFile(\sprintf('%s/%s', $folderPath,self::GITKEEP), '');
-        $this->filesystem->dumpFile(\sprintf('%s/%s', $folderPath,self::GITIGNORE), $gitIgnoreContent);
+        $this->filesystem->dumpFile(\sprintf('%s/%s', $folderPath, self::GITKEEP), '');
+        $this->filesystem->dumpFile(\sprintf('%s/%s', $folderPath, self::GITIGNORE), $gitIgnoreContent);
     }
 
     private function initializePathProject(Project $projectEnvironment): void

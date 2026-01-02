@@ -30,6 +30,10 @@ final class GitIgnoreCreateServiceStepHandler extends AbstractBuildServiceStepHa
     {
         $projectPath = $this->fileSystemEnvironmentServices->getPathProject($project);
 
+        if (null === $projectPath) {
+            throw new \RuntimeException('Project path is not defined');
+        }
+
         if (!$this->filesystem->exists($projectPath)) {
             $this->filesystem->mkdir($projectPath);
         }
@@ -38,7 +42,10 @@ final class GitIgnoreCreateServiceStepHandler extends AbstractBuildServiceStepHa
         $existingLines = [];
 
         if ($this->filesystem->exists($gitignorePath)) {
-            $existingLines = array_map('trim', file($gitignorePath));
+            $fileLines = file($gitignorePath);
+            if (false !== $fileLines) {
+                $existingLines = array_map(trim(...), $fileLines);
+            }
         }
 
         $newLines = [];
@@ -53,7 +60,7 @@ final class GitIgnoreCreateServiceStepHandler extends AbstractBuildServiceStepHa
             }
         }
 
-        if (!empty($newLines)) {
+        if ([] !== $newLines) {
             $this->filesystem->appendToFile($gitignorePath, implode(\PHP_EOL, $newLines).\PHP_EOL);
 
             $this->mercureService->dispatch(
@@ -73,4 +80,3 @@ final class GitIgnoreCreateServiceStepHandler extends AbstractBuildServiceStepHa
         return ApplicationStep::INIT_GITIGNORE;
     }
 }
-

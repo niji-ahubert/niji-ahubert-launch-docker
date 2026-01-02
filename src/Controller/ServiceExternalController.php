@@ -30,6 +30,7 @@ class ServiceExternalController extends AbstractController
         private readonly FormServiceService $formServiceService,
         private readonly TranslatorInterface $translator,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ContainerServices $containerServices,
     ) {
     }
 
@@ -99,7 +100,7 @@ class ServiceExternalController extends AbstractController
                 $messageKey = $isEdit ? 'service.success.updated' : 'service.success.created';
                 $this->addFlash('success', $this->translator->trans($messageKey));
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Erreur lors de l\'ajout du service : '.$e->getMessage());
+                $this->addFlash('error', "Erreur lors de l'ajout du service : ".$e->getMessage());
             }
         }
 
@@ -115,7 +116,6 @@ class ServiceExternalController extends AbstractController
     #[Route('/project/external-service/versions', name: 'app_service_versions')]
     public function getVersions(
         Request $request,
-        ContainerServices $containerServices,
     ): JsonResponse {
         $serviceName = $request->query->get('service');
 
@@ -123,7 +123,7 @@ class ServiceExternalController extends AbstractController
             return new JsonResponse(['versions' => []]);
         }
 
-        $serviceContainer = $containerServices->getServiceContainer($serviceName);
+        $serviceContainer = $this->containerServices->getServiceContainer($serviceName);
         $versions = $serviceContainer instanceof AbstractContainer ? $serviceContainer->getVersionSupported() : [];
 
         return new JsonResponse([

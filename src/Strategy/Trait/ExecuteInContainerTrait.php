@@ -75,7 +75,7 @@ trait ExecuteInContainerTrait
         $commandShell = \sprintf(
             'cd %s && %s',
             $workdir,
-            implode(' ', array_map('escapeshellarg', $command)),
+            implode(' ', array_map(escapeshellarg(...), $command)),
         );
 
         $dockerCommand = [

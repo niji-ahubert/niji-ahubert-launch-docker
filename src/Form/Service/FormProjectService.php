@@ -102,7 +102,7 @@ final readonly class FormProjectService
             $projectFinder = $this->finder->directories()->in($clientPath)->depth(0);
             foreach ($projectFinder as $projectDir) {
                 $projectName = $projectDir->getRelativePathname();
-                $project = (new Project())
+                $project = new Project()
                     ->setClient($project->getClient())
                     ->setProject($projectName);
 

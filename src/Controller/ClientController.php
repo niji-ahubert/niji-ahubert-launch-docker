@@ -145,13 +145,7 @@ class ClientController extends AbstractController
         try {
             $normalizedName = $this->clientNameNormalizer->normalize($clientName);
             $existingClients = $this->fileSystemEnvironmentServices->getFolder(FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY);
-            $exists = false;
-            foreach ($existingClients as $existingClient) {
-                if (strtolower($existingClient) === strtolower($normalizedName)) {
-                    $exists = true;
-                    break;
-                }
-            }
+            $exists = array_any($existingClients, fn ($existingClient): bool => strtolower((string) $existingClient) === strtolower($normalizedName));
 
             if ($exists) {
                 return new JsonResponse([

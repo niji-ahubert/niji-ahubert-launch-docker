@@ -7,6 +7,7 @@ namespace App\Enum;
 enum PhpExtension: string
 {
     use UtilityTrait;
+
     case APCU = 'apcu';
 
     case BCMATH = 'bcmath';

@@ -31,7 +31,7 @@ final class SymfonyCreateServiceStepHandler extends AbstractBuildServiceStepHand
             $hostUid,
             $hostGid,
             $projectRoot,
-            $projectsRootHost
+            $projectsRootHost,
         );
     }
 

@@ -17,7 +17,7 @@ class DockerComposeFileManipulator
     {
         if (null === $contents) {
             $this->manipulator = new YamlSourceManipulator(
-                (new Dumper())->dump($this->getBasicStructure(), 2),
+                new Dumper()->dump($this->getBasicStructure(), 2),
             );
         } else {
             $this->manipulator = new YamlSourceManipulator($contents);

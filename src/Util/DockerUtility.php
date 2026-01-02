@@ -150,7 +150,7 @@ final readonly class DockerUtility
         $env = $project->getEnvironmentContainer()->value;
         $nodeServices = array_filter(
             $project->getServiceContainer(),
-            static fn ($service): bool => ProjectContainer::NODE === $service->getServiceContainer(),
+            static fn (AbstractContainer $service): bool => ProjectContainer::NODE === $service->getServiceContainer(),
         );
 
         $index = array_search($serviceContainer, array_values($nodeServices), true);

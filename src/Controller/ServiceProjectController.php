@@ -78,7 +78,7 @@ class ServiceProjectController extends AbstractController
         }
 
         $extensions = match ($language) {
-            ProjectContainer::PHP->value => array_map(static fn ($case): PhpExtension => $case, PhpExtension::cases()),
+            ProjectContainer::PHP->value => array_map(static fn (PhpExtension $case): PhpExtension => $case, PhpExtension::cases()),
             default => [],
         };
 

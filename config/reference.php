@@ -969,6 +969,11 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     },
  *     default_transport?: scalar|null|Param, // Default: "default"
  * }
+ * @psalm-type TalesFromADevTwigExtraTailwindConfig = array{
+ *     tailwind_merge?: array{
+ *         additional_configuration?: mixed, // Default: []
+ *     },
+ * }
  * @psalm-type TalesFromADevFlowbiteConfig = array<mixed>
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
@@ -982,6 +987,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     mercure?: MercureConfig,
  *     stimulus?: StimulusConfig,
  *     turbo?: TurboConfig,
+ *     tales_from_a_dev_twig_extra_tailwind?: TalesFromADevTwigExtraTailwindConfig,
  *     tales_from_a_dev_flowbite?: TalesFromADevFlowbiteConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
@@ -998,6 +1004,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         mercure?: MercureConfig,
  *         stimulus?: StimulusConfig,
  *         turbo?: TurboConfig,
+ *         tales_from_a_dev_twig_extra_tailwind?: TalesFromADevTwigExtraTailwindConfig,
  *         tales_from_a_dev_flowbite?: TalesFromADevFlowbiteConfig,
  *     },
  *     "when@prod"?: array{
@@ -1012,6 +1019,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         mercure?: MercureConfig,
  *         stimulus?: StimulusConfig,
  *         turbo?: TurboConfig,
+ *         tales_from_a_dev_twig_extra_tailwind?: TalesFromADevTwigExtraTailwindConfig,
  *         tales_from_a_dev_flowbite?: TalesFromADevFlowbiteConfig,
  *     },
  *     "when@test"?: array{
@@ -1027,6 +1035,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         mercure?: MercureConfig,
  *         stimulus?: StimulusConfig,
  *         turbo?: TurboConfig,
+ *         tales_from_a_dev_twig_extra_tailwind?: TalesFromADevTwigExtraTailwindConfig,
  *         tales_from_a_dev_flowbite?: TalesFromADevFlowbiteConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias

@@ -31,7 +31,7 @@ final class LaravelCreateServiceStepHandler extends AbstractBuildServiceStepHand
             $hostUid,
             $hostGid,
             $projectRoot,
-            $projectsRootHost
+            $projectsRootHost,
         );
     }
 

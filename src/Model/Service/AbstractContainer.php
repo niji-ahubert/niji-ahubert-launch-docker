@@ -16,7 +16,7 @@ use App\Enum\ServiceVersion\VersionPhpSupported;
 use App\Enum\ServiceVersion\VersionRedisSupported;
 use App\Enum\ServiceVersion\VersionServiceSupportedInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Uid\Uuid;
 

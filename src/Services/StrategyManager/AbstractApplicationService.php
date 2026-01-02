@@ -44,7 +44,7 @@ abstract class AbstractApplicationService
             foreach ($this->strategies as $strategy) {
                 if ($strategy->supports($serviceContainer, $dockerAction)) {
                     $this->mercureService->dispatch(
-                        message: \sprintf('🔄 Utilisation de la stratégie: %s', (new \ReflectionClass($strategy))->getShortName()),
+                        message: \sprintf('🔄 Utilisation de la stratégie: %s', new \ReflectionClass($strategy)->getShortName()),
                     );
                     $strategy->execute($serviceContainer, $project, $dockerAction);
                 }

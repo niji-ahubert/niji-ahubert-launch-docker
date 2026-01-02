@@ -9,7 +9,6 @@ use App\Model\Project;
 use App\Services\FileSystemEnvironmentServices;
 use App\Services\Mercure\MercureService;
 use App\Util\DockerUtility;
-use App\Util\EnvVarUtility;
 use Monolog\Level;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Component\Filesystem\Filesystem;
@@ -39,27 +38,33 @@ final readonly class TaskfileGenerationService
 
             // Read the template content
             $templateContent = file_get_contents($this->fileSystemEnvironmentServices->getTaskFileSkeletonFile());
-            
+            if (false === $templateContent) {
+                throw new \RuntimeException('Failed to read Taskfile skeleton template');
+            }
+
             // Replace placeholders with actual values
             $projectName = DockerUtility::getProjectName($project);
-            $projectRoot = $this->fileSystemEnvironmentServices->getPathProject($project);
 
+            $projectRoot = $this->fileSystemEnvironmentServices->getPathProject($project);
+            if (null === $projectRoot) {
+                throw new \RuntimeException('Project root path is not defined');
+            }
 
             $replacements = [
                 '{{PROJECT_NAME}}' => $projectName,
-                '{{PROJECTS_ROOT_CONTEXT}}' => dirname($projectRoot),
+                '{{PROJECTS_ROOT_CONTEXT}}' => \dirname($projectRoot),
                 '{{PROJECT_ROOT}}' => $projectRoot,
-                '{{CLIENT}}' => $project->getClient() ?? 'default',
-                '{{PROJECT}}' => $project->getProject() ?? 'default'
+                '{{CLIENT}}' => $project->getClient(),
+                '{{PROJECT}}' => $project->getProject(),
             ];
-            
+
             // Apply replacements
             $generatedContent = str_replace(
                 array_keys($replacements),
                 array_values($replacements),
-                $templateContent
+                $templateContent,
             );
-            
+
             // Write the generated content to the target file
             $this->filesystem->dumpFile($taskfileConfigPath, $generatedContent);
             $this->makerGenerator->writeChanges();

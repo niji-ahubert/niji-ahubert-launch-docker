@@ -7,29 +7,9 @@ namespace App\Strategy\DockerService;
 use App\Enum\ContainerType\ServiceContainer;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
-use App\Services\DockerCompose\DockerComposeFile;
-use App\Services\FileSystemEnvironmentServices;
-use Symfony\Bundle\MakerBundle\Generator;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class MysqlDockerService extends AbstractDatabaseDockerService
 {
-    public function __construct(
-        #[Autowire(param: 'bdd.root_password')]
-        string $rootPassword,
-        #[Autowire(param: 'bdd.database')]
-        string $database,
-        #[Autowire(param: 'bdd.user')]
-        string $dbUser,
-        #[Autowire(param: 'bdd.password')]
-        string $dbPassword,
-        DockerComposeFile $dockerComposeFile,
-        Generator $makerGenerator,
-        FileSystemEnvironmentServices $fileSystemEnvironmentServices,
-    ) {
-        parent::__construct($rootPassword, $database, $dbUser, $dbPassword, $dockerComposeFile, $makerGenerator, $fileSystemEnvironmentServices);
-    }
-
     public function support(AbstractContainer $service): bool
     {
         return ServiceContainer::MYSQL === $service->getServiceContainer();

@@ -38,7 +38,7 @@ final readonly class ServerEventModel
 
     public function getTimestamp(): string
     {
-        return (new \DateTime())->format('Y-m-d H:i:s');
+        return new \DateTime()->format('Y-m-d H:i:s');
     }
 
     public function getLevel(): ?Level

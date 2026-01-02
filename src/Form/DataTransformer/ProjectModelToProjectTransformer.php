@@ -12,7 +12,7 @@ class ProjectModelToProjectTransformer
 {
     public function transform(Project $project): ProjectModel
     {
-        return (new ProjectModel())
+        return new ProjectModel()
             ->setClient($project->getClient())
             ->setProject($project->getProject())
             ->setTraefikNetwork($project->getTraefikNetwork())

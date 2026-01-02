@@ -13,7 +13,7 @@ use App\Enum\ServiceVersion\VersionLaravelSupported;
 use App\Enum\ServiceVersion\VersionReactSupported;
 use App\Enum\ServiceVersion\VersionSymfonySupported;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-use Symfony\Component\Serializer\Annotation\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap; // Change Annotation to Attribute
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Uid\Uuid;
 

@@ -21,14 +21,16 @@ tasks:
     silent: true
     cmds:
      - echo "Running Security Check..."
-     - 'docker run --rm --interactive --tty --env GIT_SAFE_DIRECTORY=* --volume $PWD:/app composer audit'
+     - 'docker run --rm --interactive --tty --user $(id -u):$(id -g) --env GIT_SAFE_DIRECTORY=* --volume $PWD:/app composer audit'
+
 
   composer-oudated:
     desc: "🔍 Check for outdated packages"
     silent: true
     cmds:
       - echo "Checking for outdated packages..."
-      - 'docker run --rm --interactive --tty --env GIT_SAFE_DIRECTORY=* --volume $PWD:/app composer outdated'
+      - 'docker run --rm --interactive --tty --user $(id -u):$(id -g) --env GIT_SAFE_DIRECTORY=* --volume $PWD:/app composer outdated'
+
 
   phpstan:
     desc: "🔍 Run phpstan"

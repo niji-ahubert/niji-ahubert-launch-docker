@@ -17,7 +17,6 @@ use App\Services\FileSystemEnvironmentServices;
 use App\Services\Mercure\MercureService;
 use App\Services\StrategyManager\CreateApplicationService;
 use App\Util\DockerUtility;
-use App\Services\Generation\TaskfileGenerationService;
 use Monolog\Level;
 
 final readonly class ProjectGenerationService
@@ -60,7 +59,6 @@ final readonly class ProjectGenerationService
 
             return;
         }
-
 
         $this->mercureService->dispatch(
             message: '📦 Création dossier logs',
