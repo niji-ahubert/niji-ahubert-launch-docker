@@ -20,7 +20,7 @@ tasks:
     desc: "🔍 Run composer audit"
     silent: true
     cmds:
-     - echo "Running Security Check..."
+     - echo "🔒 Running Security Check..."
      - 'docker run --rm --interactive --tty --user $(id -u):$(id -g) --env GIT_SAFE_DIRECTORY=* --volume $PWD:/app composer audit'
 
 
@@ -28,26 +28,47 @@ tasks:
     desc: "🔍 Check for outdated packages"
     silent: true
     cmds:
-      - echo "Checking for outdated packages..."
+      - echo "🔒 Checking for outdated packages..."
       - 'docker run --rm --interactive --tty --user $(id -u):$(id -g) --env GIT_SAFE_DIRECTORY=* --volume $PWD:/app composer outdated'
 
-
+  security:
+    desc: "🔒 Run Trivy security scan"
+    silent: true
+    cmds:
+      - echo "🔒 Running Trivy security scan..."
+      - 'docker run --rm -v $(pwd):/app -v ${HOME}/.trivy/.cache:/root/.cache/ -w /app aquasec/trivy:latest --exit-code 1 fs --scanners vuln .'
+    
   phpstan:
     desc: "🔍 Run phpstan"
     silent: true
     cmds:
-      - echo "Running PHPStan..."
-      - 'docker run --rm -v $(pwd):/app ghcr.io/phpstan/phpstan analyse --memory-limit=-1'
+      - echo "🔍 Running PHPStan..."
+      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off webserver-php vendor/bin/phpstan analyse src --memory-limit=-1'
+
+  rector:
+    desc: "🔍 Run rector"
+    silent: true
+    cmds:
+      - echo "🔍 Running Rector..."
+      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off webserver-php vendor/bin/rector process --config rector.php'
+
+  phpcsfixer:
+    desc: "🔍 Run php-cs-fixer"
+    silent: true
+    cmds:
+      - echo "🔍 Running PHP-CS-Fixer..."
+      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off webserver-php vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --diff'
 
   qa:
     desc: "🔍 Run quality assurance tools"
     cmds:
-      - echo "Running Rector..."
-      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off webserver-php vendor/bin/rector process --config rector.php'
-      - echo "Running PHP-CS-Fixer..."
-      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off webserver-php vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --diff'
-      - echo "Running PHPStan..."
-      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off webserver-php vendor/bin/phpstan analyse src --memory-limit=-1'
+      - task: rector
+      - task: phpcsfixer
+      - task: phpstan
+      - task: security
+      - task: composer-audit
+      - task: composer-oudated
+
 
 
   bash:
