@@ -17,9 +17,7 @@ services:
       args:
         PHP_VERSION: ${PHP_VERSION}
     volumes:
-      - ${PROJECT_ROOT}/tools:/opt/tools
-      - ${PROJECT_ROOT}/resources/docker/entrypoint/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint
-      - ${PROJECT_ROOT}/src/Resources:/opt/scripts
+      - ${WSL_PATH_FOLDER_SOCLE_ROOT}/resources/docker/entrypoint/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint
       - composer-cache:/composer-cache:rw
       - ~/.ssh:/home/admin/.ssh:ro
       - ~/.ssh:/root/.ssh:ro
@@ -37,7 +35,7 @@ services:
       - traefik
     build:
       target: stage_prod
-      context: ${PROJECTS_ROOT_HOST:-${PROJECT_ROOT}/projects}/${CLIENT}/${PROJECT}
+      context: ${WSL_PATH_FOLDER_PROJECTS_ROOT:-${WSL_PATH_FOLDER_SOCLE_ROOT}/projects}/${CLIENT}/${PROJECT}
       args:
         PHP_VERSION: ${PHP_VERSION}
         PROJECT: ${PROJECT}
@@ -48,5 +46,5 @@ services:
       - traefik.http.services.${CLIENT}-${PROJECT}${FOLDER_NAME}-prod.loadbalancer.server.port=${PORT_NUMBER:-9000}
       - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}-prod.tls=true
     volumes:
-      - ${PROJECT_ROOT}/src/Resources/docker/entrypoint/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint
+      - ${WSL_PATH_FOLDER_SOCLE_ROOT}/src/Resources/docker/entrypoint/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint
       - composer-cache:/composer-cache:rw

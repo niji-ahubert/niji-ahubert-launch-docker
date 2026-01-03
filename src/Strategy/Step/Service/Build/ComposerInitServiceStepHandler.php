@@ -36,7 +36,7 @@ final class ComposerInitServiceStepHandler extends AbstractBuildServiceStepHandl
             '--no-interaction',
         ];
 
-        $this->processRunner->run($cmd, 'Initialisation de la cmd Composer init', $applicationProjectPath);
+        $this->processRunner->run($cmd, 'Initialisation de la cmd Composer init', $applicationProjectPath, ['XDEBUG_MODE' => 'off']);
     }
 
     public static function getPriority(): int

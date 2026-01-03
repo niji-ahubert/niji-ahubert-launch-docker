@@ -30,7 +30,7 @@ final class AccessRightServiceStepHandler extends AbstractBuildServiceStepHandle
             return;
         }
 
-        $cmdShell = 'find . -type d -exec chmod 775 {} + && find . -type f -exec chmod 664 {} + ';
+        $cmdShell = 'find . -path ./vendor -prune -o -type d -exec chmod 775 {} + && find . -path ./vendor -prune -o -type f -exec chmod 664 {} +';
         $command = [
             'sh', '-c', $cmdShell,
         ];

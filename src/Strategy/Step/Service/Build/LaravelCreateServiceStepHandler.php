@@ -21,8 +21,8 @@ final class LaravelCreateServiceStepHandler extends AbstractBuildServiceStepHand
         ProcessRunnerService $processRunner,
         string $hostUid,
         string $hostGid,
-        string $projectRoot,
-        string $projectsRootHost,
+        string $wslPathFolderSocleRoot,
+        string $wslPathFolderProjectsRoot,
     ) {
         parent::__construct(
             $fileSystemEnvironmentServices,
@@ -30,8 +30,8 @@ final class LaravelCreateServiceStepHandler extends AbstractBuildServiceStepHand
             $processRunner,
             $hostUid,
             $hostGid,
-            $projectRoot,
-            $projectsRootHost,
+            $wslPathFolderSocleRoot,
+            $wslPathFolderProjectsRoot,
         );
     }
 

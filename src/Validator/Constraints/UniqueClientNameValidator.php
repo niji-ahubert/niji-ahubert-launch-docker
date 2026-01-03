@@ -69,7 +69,7 @@ class UniqueClientNameValidator extends ConstraintValidator
     private function clientDirectoryExists(string $clientName, ?string $originalClient = null): bool
     {
         // Obtenir la liste des clients existants via EnvironmentServices
-        $existingClients = $this->environmentServices->getFolder(FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY);
+        $existingClients = $this->environmentServices->getFolder(FileSystemEnvironmentServices::PROJECT_ROOT_FOLDER_IN_DOCKER);
         // Vérifier si le nom normalisé existe déjà (insensible à la casse)
         foreach ($existingClients as $existingClient) {
             if (strtolower($existingClient) === strtolower($clientName)) {

@@ -20,6 +20,8 @@ final readonly class TaskfileGenerationService
         private MercureService $mercureService,
         private Generator $makerGenerator,
         private Filesystem $filesystem,
+        private string $wslPathFolderSocleRoot,
+        private string $wslPathFolderProjectsRoot,
     ) {
     }
 
@@ -42,18 +44,11 @@ final readonly class TaskfileGenerationService
                 throw new \RuntimeException('Failed to read Taskfile skeleton template');
             }
 
-            // Replace placeholders with actual values
-            $projectName = DockerUtility::getProjectName($project);
-
-            $projectRoot = $this->fileSystemEnvironmentServices->getPathProject($project);
-            if (null === $projectRoot) {
-                throw new \RuntimeException('Project root path is not defined');
-            }
-
             $replacements = [
-                '{{PROJECT_NAME}}' => $projectName,
-                '{{PROJECTS_ROOT_CONTEXT}}' => \dirname($projectRoot),
-                '{{PROJECT_ROOT}}' => $projectRoot,
+                '{{WSL_PATH_FOLDER_SOCLE_ROOT}}' => $this->wslPathFolderSocleRoot,
+                '{{PROJECT_NAME}}' => DockerUtility::getProjectName($project),
+                '{{WSL_PATH_FOLDER_PROJECTS_ROOT}}' => $this->wslPathFolderProjectsRoot,
+                '{{PROJECT_ROOT_FOLDER_IN_DOCKER}}' => $this->fileSystemEnvironmentServices::PROJECT_ROOT_FOLDER_IN_DOCKER,
                 '{{CLIENT}}' => $project->getClient(),
                 '{{PROJECT}}' => $project->getProject(),
             ];

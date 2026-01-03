@@ -17,8 +17,8 @@ abstract class AbstractBuildServiceStepHandler extends AbstractServiceStepHandle
         ProcessRunnerService $processRunner,
         protected readonly ?string $hostUid = null,
         protected readonly ?string $hostGid = null,
-        protected readonly ?string $projectRoot = null,
-        protected readonly ?string $projectsRootHost = null,
+        protected readonly ?string $wslPathFolderSocleRoot = null,
+        protected readonly ?string $wslPathFolderProjectsRoot = null,
     ) {
         parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
     }
@@ -30,23 +30,23 @@ abstract class AbstractBuildServiceStepHandler extends AbstractServiceStepHandle
 
     protected function resolveHostPath(string $containerPath): string
     {
-        if (null === $this->projectRoot || null === $this->projectsRootHost) {
+        if (null === $this->wslPathFolderSocleRoot || null === $this->wslPathFolderProjectsRoot) {
             throw new \RuntimeException('Project root configuration is missing');
         }
 
-        $internalProjectsPath = FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY;
+        $internalProjectsPath = FileSystemEnvironmentServices::PROJECT_ROOT_FOLDER_IN_DOCKER;
 
         if (str_starts_with($containerPath, $internalProjectsPath)) {
             $relativePath = substr($containerPath, \strlen($internalProjectsPath));
-            $hostBase = $this->projectsRootHost;
+            $hostBase = $this->wslPathFolderProjectsRoot;
 
             if (!str_starts_with($hostBase, '/')) {
-                $hostBase = \sprintf('%s/%s', $this->projectRoot, $hostBase);
+                $hostBase = \sprintf('%s/%s', $this->wslPathFolderSocleRoot, $hostBase);
             }
 
             return \sprintf('%s%s', $hostBase, $relativePath);
         }
 
-        return str_replace(FileSystemEnvironmentServices::GENERATOR_ROOT_DIRECTORY, $this->projectRoot, $containerPath);
+        return str_replace(FileSystemEnvironmentServices::DOCKER_ROOT_DIRECTORY, $this->wslPathFolderSocleRoot, $containerPath);
     }
 }

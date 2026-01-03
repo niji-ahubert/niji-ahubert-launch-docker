@@ -28,3 +28,14 @@ Dockerfile*
 # Tests
 /tests
 phpunit.xml.dist
+
+resources/*
+!resources/docker/
+resources/docker/*
+!resources/docker/php/
+!resources/docker/entrypoint/
+resources/docker/php/*
+!resources/docker/php/opcache-recommended.ini
+!resources/docker/php/www.conf
+resources/docker/entrypoint/*
+!resources/docker/entrypoint/docker-entrypoint.sh

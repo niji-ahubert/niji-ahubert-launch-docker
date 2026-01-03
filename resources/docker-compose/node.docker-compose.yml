@@ -13,18 +13,18 @@ services:
     networks:
       - traefik
     build:
-      context: ${PROJECTS_ROOT_HOST:-${PROJECT_ROOT}/projects}/${CLIENT}/${PROJECT}/${FOLDER_NAME}
-      dockerfile: ${PROJECT_ROOT}/Dockerfile.node
+      context: ${WSL_PATH_FOLDER_PROJECTS_ROOT:-${WSL_PATH_FOLDER_SOCLE_ROOT}/projects}/${CLIENT}/${PROJECT}/${FOLDER_NAME}
+      dockerfile: ${WSL_PATH_FOLDER_SOCLE_ROOT}/Dockerfile.node
       target: node_dev
       args:
         NODE_VERSION: ${NODE_VERSION}
     volumes:
-      - ${PROJECTS_ROOT_HOST:-${PROJECT_ROOT}/projects}/${CLIENT}/${PROJECT}/${FOLDER_NAME}:/app:rw
+      - ${WSL_PATH_FOLDER_PROJECTS_ROOT:-${WSL_PATH_FOLDER_SOCLE_ROOT}/projects}/${CLIENT}/${PROJECT}/${FOLDER_NAME}:/app:rw
       - ./tools:/opt/tools
       - npm-cache:/root/.npm:rw
       - ~/.ssh:/home/admin/.ssh:ro
       - ~/.ssh:/root/.ssh:ro
-    env_file: "${PROJECTS_ROOT_HOST:-${PROJECT_ROOT}/projects}/${CLIENT}/${PROJECT}/config/${FOLDER_NAME}.env"
+    env_file: "${WSL_PATH_FOLDER_PROJECTS_ROOT:-${WSL_PATH_FOLDER_SOCLE_ROOT}/projects}/${CLIENT}/${PROJECT}/config/${FOLDER_NAME}.env"
     labels:
       - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}.rule=Host(`${URL_LOCAL_WEBSITE}`)
       - traefik.enable=true
@@ -36,12 +36,12 @@ services:
   node-prod:
     profiles: [ 'node-prod' ]
     image: project-${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}:${TAG_VERSION:-latest}
-    env_file: "${PROJECTS_ROOT_HOST:-${PROJECT_ROOT}/projects}/${CLIENT}/${PROJECT}/config/${FOLDER_NAME}.env"
+    env_file: "${WSL_PATH_FOLDER_PROJECTS_ROOT:-${WSL_PATH_FOLDER_SOCLE_ROOT}/projects}/${CLIENT}/${PROJECT}/config/${FOLDER_NAME}.env"
     networks:
       - traefik
     build:
-      context: ${PROJECTS_ROOT_HOST:-${PROJECT_ROOT}/projects}/${CLIENT}/${PROJECT}/${FOLDER_NAME}
-      dockerfile: ${PROJECT_ROOT}/Dockerfile.node
+      context: ${WSL_PATH_FOLDER_PROJECTS_ROOT:-${WSL_PATH_FOLDER_SOCLE_ROOT}/projects}/${CLIENT}/${PROJECT}/${FOLDER_NAME}
+      dockerfile: ${WSL_PATH_FOLDER_SOCLE_ROOT}/Dockerfile.node
       target: node_prod
       args:
         NODE_VERSION: ${NODE_VERSION}

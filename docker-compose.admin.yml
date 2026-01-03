@@ -15,7 +15,7 @@ x-php-common: &php-common
   user: ${CURRENT_UID:-1000}
   volumes:
     - ./:/var/www/html:rw
-    - ${PROJECTS_ROOT_HOST:-./projects}:/var/www/html/projects:rw
+    - ${WSL_PATH_FOLDER_PROJECTS_ROOT}:/var/www/html/projects:rw
     - composer-cache:/composer-cache:rw
     - ~/.ssh:/home/admin/.ssh:ro
     - ~/.ssh/known_hosts:/home/admin/.ssh/known_hosts:rw
@@ -29,8 +29,9 @@ x-php-common: &php-common
 # Configuration commune pour le build PHP
 x-php-build: &php-build
   context: ./
+  dockerfile: Dockerfile
   args:
-    PHP_VERSION: ${PHP_VERSION:-8.5}
+    PHP_VERSION: ${PHP_VERSION:-8.3}
 
 services:
   #CLI VERSION NOT UP TO DATE
@@ -44,6 +45,7 @@ services:
   webserver-php:
     <<: *php-common
     profiles: [ webserver ]
+    image: generator-socle-php-${PHP_VERSION}:latest
     container_name: niji-generator-webserver-php
     user: "${HOST_UID:-1000}"
     networks:
@@ -59,9 +61,9 @@ services:
       XDEBUG_MODE: "debug"
       HOST_UID: ${HOST_UID:-1000}
       HOST_GID: ${HOST_GID:-1000}
-      PROJECT_ROOT: ${PROJECT_ROOT}
-      PROJECTS_ROOT_HOST: ${PROJECTS_ROOT_HOST:-./projects}
-      PROJECTS_ROOT_CONTEXT: /var/www/html/projects
+      WSL_PATH_FOLDER_SOCLE_ROOT: ${WSL_PATH_FOLDER_SOCLE_ROOT}
+      WSL_PATH_FOLDER_PROJECTS_ROOT: ${WSL_PATH_FOLDER_PROJECTS_ROOT}
+      DOCKER_PATH_FOLDER_PROJECT_ROOT: /var/www/html/projects
       IP_WSL_ETH: ${IP_WSL_ETH}
     restart: unless-stopped
 
@@ -89,13 +91,6 @@ services:
       - traefik.http.routers.mercure.tls=true
       - traefik.http.services.mercure.loadbalancer.server.port=80
       - traefik.docker.network=${TRAEFIK_NETWORK:-public-dev}
-  security:
-    container_name: niji-generator-security
-    image: aquasec/trivy:latest
-    working_dir: /app
-    volumes:
-      - ./:/app
-      - ${HOME}/.trivy/.cache:/root/.cache/
   nginx:
     image: nginx:1.25-alpine
     profiles: [ webserver ]

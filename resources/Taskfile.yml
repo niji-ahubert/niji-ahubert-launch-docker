@@ -2,42 +2,121 @@ version: '3'
 dotenv: ['.env']
 
 env:
-  PROJECTS_ROOT_CONTEXT: "{{PROJECTS_ROOT_CONTEXT}}"
-  PROJECT_ROOT: "{{PROJECT_ROOT}}"
+  WSL_PATH_FOLDER_SOCLE_ROOT: "{{WSL_PATH_FOLDER_SOCLE_ROOT}}"
+  WSL_PATH_FOLDER_PROJECTS_ROOT: "{{WSL_PATH_FOLDER_PROJECTS_ROOT}}"
+  PROJECT_ROOT_FOLDER_IN_DOCKER: "{{PROJECT_ROOT_FOLDER_IN_DOCKER}}"
   CLIENT: "{{CLIENT}}"
   PROJECT: "{{PROJECT}}"
+  PROJECT_NAME: "{{PROJECT_NAME}}"
 
 vars:
-  CONTAINER: '{{default "webserver-php" .CONTAINER}}'
-  PROJECT_ROOT:
-    sh: 'pwd'
   DOCKER_GID:
     sh: 'getent group docker | cut -d: -f3'
-  DOCKER_COMP: docker --log-level=ERROR compose --project-name generator-socle
-  DOCKER_EXEC: '{{.DOCKER_COMP}} exec'
-  DOCKER_ADMIN_COMP: docker --log-level=ERROR compose -f launcher-docker-compose.yml --profile runner-dev
+  DOCKER_ADMIN_COMP: docker --log-level=ERROR compose -f launcher-docker-compose.yml --project-name {{PROJECT_NAME}} --profile runner-dev
   ENV_IP_WSL_ETH:
     sh: printenv IP_WSL_ETH
+
+
 tasks:
 
+  service-running:
+    desc: "📋 Available services:"
+    silent: true
+    cmds:
+      - '{{.DOCKER_ADMIN_COMP}} ps --services'
+
+  composer-audit:
+    desc: "🔍 Run composer audit"
+    silent: true
+    internal: true
+    vars:
+      SERVICE_NAME:
+        sh: '{{if .SERVICE_NAME}}echo {{.SERVICE_NAME}}{{else}}task service-running | gum choose{{end}}'
+    cmds:
+      - echo "🔒 Running Security Check..."
+      - 'docker run --rm --interactive --tty --user $(id -u):$(id -g) --env GIT_SAFE_DIRECTORY=* --volume $PWD:/app composer audit'
+
+  composer-outdated:
+    desc: "🔍 Check for outdated packages"
+    silent: true
+    internal: true
+    vars:
+      SERVICE_NAME:
+        sh: '{{if .SERVICE_NAME}}echo {{.SERVICE_NAME}}{{else}}task service-running | gum choose{{end}}'
+    cmds:
+      - echo "🔒 Checking for outdated packages..."
+      - 'docker run --rm --interactive --tty --user $(id -u):$(id -g) --env GIT_SAFE_DIRECTORY=* --volume $PWD:/app composer outdated'
+
+  security:
+    desc: "🔒 Run Trivy security scan"
+    silent: true
+    internal: true
+    cmds:
+      - echo "🔒 Running Trivy security scan..."
+      - 'docker run --rm -v $(pwd):/app -v ${HOME}/.trivy/.cache:/root/.cache/ -w /app aquasec/trivy:latest --exit-code 1 fs --scanners vuln .'
+
+  phpstan:
+    desc: "🔍 Run phpstan"
+    silent: true
+    internal: true
+    vars:
+      SERVICE_NAME:
+        sh: '{{if .SERVICE_NAME}}echo {{.SERVICE_NAME}}{{else}}task service-running | gum choose{{end}}'
+    cmds:
+      - echo "🔍 Running PHPStan..."
+      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.SERVICE_NAME}} vendor/bin/phpstan analyse src --memory-limit=-1'
+
+  rector:
+    desc: "🔍 Run rector "
+    silent: true
+    internal: true
+    vars:
+      SERVICE_NAME:
+        sh: '{{if .SERVICE_NAME}}echo {{.SERVICE_NAME}}{{else}}task service-running | gum choose{{end}}'
+    cmds:
+      - echo "🔍 Running Rector... {{.SERVICE_NAME}}"
+      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.SERVICE_NAME}} vendor/bin/rector process --config rector.php'
+
+  phpcsfixer:
+    desc: "🔍 Run php-cs-fixer"
+    silent: true
+    internal: true
+    vars:
+      SERVICE_NAME:
+        sh: '{{if .SERVICE_NAME}}echo {{.SERVICE_NAME}}{{else}}task service-running | gum choose{{end}}'
+    cmds:
+      - echo "🔍 Running PHP-CS-Fixer..."
+      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.SERVICE_NAME}} vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --diff'
 
   qa:
     desc: "🔍 Run quality assurance tools"
+    silent: true
+    vars:
+      SERVICE_NAME:
+        sh: task service-running | gum choose
     cmds:
-      - echo "Running Rector..."
-      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.CONTAINER}} vendor/bin/rector process --config rector.php'
-      - echo "Running PHP-CS-Fixer..."
-      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.CONTAINER}} vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --diff'
-      - echo "Running PHPStan..."
-      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.CONTAINER}} vendor/bin/phpstan analyse src --memory-limit=-1'
-      # - echo "Running Security Check..."
-      # - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.CONTAINER}} composer audit'
+      - task: rector
+        vars: { SERVICE_NAME: "{{.SERVICE_NAME}}" }
+      - task: phpcsfixer
+        vars: { SERVICE_NAME: "{{.SERVICE_NAME}}" }
+      - task: phpstan
+        vars: { SERVICE_NAME: "{{.SERVICE_NAME}}" }
+      - task: security
+      - task: composer-audit
+        vars: { SERVICE_NAME: "{{.SERVICE_NAME}}" }
+      - task: composer-outdated
+        vars: { SERVICE_NAME: "{{.SERVICE_NAME}}" }
+
 
   bash:
     desc: "🐚 Start a bash shell in webserver for new project"
     silent: true
+    vars:
+      SERVICE_NAME:
+        sh: '{{if .SERVICE_NAME}}echo {{.SERVICE_NAME}}{{else}}task service-running | gum choose{{end}}'
     cmds:
-      - '{{.DOCKER_ADMIN_COMP}} exec {{.CONTAINER}} bash'
+      - echo "🔍 Running Bash access..."
+      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.SERVICE_NAME}} bash'
 
 
   default:
@@ -54,18 +133,19 @@ tasks:
       - stop
     cmds:
       - echo "🚀 Start webserver for new project development"
-      - '{{.DOCKER_ADMIN_COMP}} --project-name <?= $project_name ?> up -d'
+      - '{{.DOCKER_ADMIN_COMP}} --project-name {{.PROJECT_NAME}} up -d'
 
   stop:
     desc: "⏹️ Stop the docker-compose stack for new project"
     silent: true
     cmds:
       - echo "⏹️ Stop the docker-compose stack for new project"
-      - '{{.DOCKER_ADMIN_COMP}} down --remove-orphans'
+      - '{{.DOCKER_ADMIN_COMP}} --profile runner-dev down --remove-orphans'
 
   check_permissions:
     desc: "Ensure bin/healthcheckTraefik.sh is executable"
     silent: true
+    internal: true
     cmds:
       - 'if [ ! -x bin/healthcheckTraefik.sh ]; then sudo chmod +x bin/healthcheckTraefik.sh; fi'
 
@@ -77,3 +157,4 @@ tasks:
       - check_permissions
     cmds:
       - ./bin/healthcheckTraefik.sh
+

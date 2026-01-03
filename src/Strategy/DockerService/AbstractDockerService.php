@@ -27,11 +27,11 @@ abstract readonly class AbstractDockerService
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
-        $this->fileSystemEnvironmentServices->loadEnvironments($project);
         $volumeName = \sprintf('my-data-%s-%s-%s', $project->getClient(), $project->getProject(), $serviceContainer->getServiceContainer()->value);
         $service = $this->getServiceSkeleton($volumeName, $serviceContainer, $project);
 
         $dockerComposeFilePath = $this->fileSystemEnvironmentServices->getDockerComposeFilePath($project);
+
         if ($serviceContainer->getServiceContainer() instanceof ProjectContainer) {
             $serviceName = DockerComposeUtility::getProjectServiceName($project, $serviceContainer);
         } else {

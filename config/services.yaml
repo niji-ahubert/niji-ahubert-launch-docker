@@ -14,7 +14,6 @@ parameters:
   bdd.password: '!ChangeMe!'
   default_uid: '1000'
   default_gid: '1000'
-  default_projects_root: './projects'
   
 services:
   # default configuration for services in *this* file
@@ -26,8 +25,8 @@ services:
       string $projectDir: '%kernel.project_dir%'
       string $hostUid: '%env(default:default_uid:HOST_UID)%'
       string $hostGid: '%env(default:default_gid:HOST_GID)%'
-      string $projectRoot: '%env(PROJECT_ROOT)%'
-      string $projectsRootHost: '%env(default:default_projects_root:PROJECTS_ROOT_HOST)%'
+      string $wslPathFolderSocleRoot: '%env(WSL_PATH_FOLDER_SOCLE_ROOT)%'
+      string $wslPathFolderProjectsRoot: '%env(WSL_PATH_FOLDER_PROJECTS_ROOT)%'
 
   # makes classes in src/ available to be used as services
   # this creates a service per class whose id is the fully-qualified class name

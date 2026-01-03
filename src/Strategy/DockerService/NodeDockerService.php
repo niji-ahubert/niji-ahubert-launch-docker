@@ -19,8 +19,9 @@ final readonly class NodeDockerService extends AbstractDockerService
     protected function getServiceSkeleton(string $volumeName, AbstractContainer $service, Project $project): array
     {
         return [
+            'profiles' => ['runner-dev'],
             'extends' => [
-                'file' => \sprintf('${PROJECT_ROOT}/resources/docker-compose/%s.docker-compose.yml', $service->getServiceContainer()->value),
+                'file' => \sprintf('${WSL_PATH_FOLDER_SOCLE_ROOT}/resources/docker-compose/%s.docker-compose.yml', $service->getServiceContainer()->value),
                 'service' => \sprintf('%s-%s', $service->getServiceContainer()->value, Environment::DEV->value),
             ],
         ];

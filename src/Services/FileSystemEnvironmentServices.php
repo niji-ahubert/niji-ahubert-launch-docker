@@ -25,9 +25,15 @@ final class FileSystemEnvironmentServices
 
     public const string DOCKER_COMPOSE_FILE_NAME = 'launcher-docker-compose.yml';
 
-    public const string GENERATOR_ROOT_DIRECTORY = '/var/www/html';
+    public const string SOCLE_RESOURCES_FOLDER = 'resources';
 
-    public const string PROJECT_IN_GENERATOR_ROOT_DIRECTORY = self::GENERATOR_ROOT_DIRECTORY.'/projects';
+    public const string SOCLE_RESOURCES_DOCKER_COMPOSE_FOLDER = self::SOCLE_RESOURCES_FOLDER.'/docker-compose';
+
+    public const string SOCLE_RESOURCES_DOCKER_COMPOSE_PATTERN = self::SOCLE_RESOURCES_DOCKER_COMPOSE_FOLDER.'/%s.docker-compose.yml';
+
+    public const string DOCKER_ROOT_DIRECTORY = '/var/www/html';
+
+    public const string PROJECT_ROOT_FOLDER_IN_DOCKER = self::DOCKER_ROOT_DIRECTORY.'/projects';
 
     public const string NGINX_CONFIG_NAME = 'nginx.conf';
 
@@ -137,12 +143,12 @@ final class FileSystemEnvironmentServices
 
     public function getPathClient(string $clientName): string
     {
-        return \sprintf('%s/%s', self::PROJECT_IN_GENERATOR_ROOT_DIRECTORY, $clientName);
+        return \sprintf('%s/%s', self::PROJECT_ROOT_FOLDER_IN_DOCKER, $clientName);
     }
 
     public function getRootProjectsPath(): string
     {
-        return self::PROJECT_IN_GENERATOR_ROOT_DIRECTORY;
+        return self::PROJECT_ROOT_FOLDER_IN_DOCKER;
     }
 
     public function createProjectLogsFolder(Project $project): void
@@ -232,7 +238,7 @@ final class FileSystemEnvironmentServices
             $finder = new Finder();
             $socleFiles = $finder->files()
                 ->name(self::SOCLE_ENV)
-                ->in(self::PROJECT_IN_GENERATOR_ROOT_DIRECTORY);
+                ->in(self::PROJECT_ROOT_FOLDER_IN_DOCKER);
 
             foreach ($socleFiles as $socleFile) {
                 $projectPath = \dirname($socleFile->getPath());
@@ -380,7 +386,14 @@ final class FileSystemEnvironmentServices
 
     public function getTaskFileSkeletonFile(): string
     {
-        return \sprintf('%s/resources/%s', $this->projectDir, self::TASKFILE_NAME);
+        return \sprintf('%s/%s/%s', $this->projectDir, self::SOCLE_RESOURCES_FOLDER, self::TASKFILE_NAME);
+    }
+
+    public function getParentDockerComposeFile(AbstractContainer $serviceContainer): string
+    {
+        $filename = \sprintf(self::SOCLE_RESOURCES_DOCKER_COMPOSE_PATTERN, $serviceContainer->getServiceContainer()->value);
+
+        return \sprintf('%s/%s', $this->projectDir, $filename);
     }
 
     public function getProjectTaskFilePath(Project $project): string

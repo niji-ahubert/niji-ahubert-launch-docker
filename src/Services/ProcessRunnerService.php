@@ -37,6 +37,8 @@ final readonly class ProcessRunnerService
             type: TypeLog::START,
         );
 
+        $this->logDebugCommand($command, $env, $applicationProjectPath);
+
         $process = new Process($command, $applicationProjectPath);
         $process->setTimeout(null);
         $process->setIdleTimeout(60);
@@ -107,20 +109,85 @@ final readonly class ProcessRunnerService
         }
 
         if (Process::ERR === $type) {
-            // Docker Compose outputte les événements de cycle de vie dans stderr (ex: "Container ... Created")
-            // On les traite comme INFO sauf s'ils contiennent des indicateurs d'erreur explicites.
             $cleanMessage = trim($message);
-            if (preg_match('/^(Container|Network|Volume)\s+.*?\s+(Creating|Created|Starting|Started|Stopping|Stopped|Removing|Removed|Recreating|Recreated|Running|Waiting)$/i', $cleanMessage)) {
-                return Level::Info;
-            }
 
-            if (str_starts_with($cleanMessage, 'Attaching to')) {
-                return Level::Info;
+            // Mots-clés indiquant un message d'information de Composer
+            $infoKeywords = [
+                'Using version',
+                'has been updated',
+                'Running composer',
+                'Loading composer',
+                'Updating dependencies',
+                'Nothing to modify',
+                'packages you are using are looking for funding',
+                'Use the `composer fund` command',
+                'Extensions installed',
+                'Run composer recipes',
+                'Executing script',
+                '[OK]',
+                'Container',
+                'Network',
+                'Volume',
+                'Creating',
+                'Created',
+                'Starting',
+                'Started',
+                'Stopping',
+                'Stopped',
+                'Removing',
+                'Removed',
+                'Recreating',
+                'Recreated',
+                'Running',
+                'Waiting',
+                'Attaching to',
+                'Image',
+                'Building',
+                'Built',
+            ];
+
+            foreach ($infoKeywords as $keyword) {
+                if (str_contains($cleanMessage, $keyword)) {
+                    return Level::Info;
+                }
             }
 
             return Level::Error;
         }
 
         return Level::Info;
+    }
+
+    /**
+     * Log la commande complète avec les variables d'environnement pour le debugging.
+     *
+     * @param string[]                  $command
+     * @param array<string, int|string> $env
+     */
+    private function logDebugCommand(array $command, array $env, ?string $cwd): void
+    {
+        $envVars = [];
+        foreach ($env as $key => $value) {
+            $envVars[] = \sprintf('%s="%s"', $key, $value);
+        }
+
+        $escapedCommand = array_map(fn (string $arg): string => str_contains($arg, ' ') ? '"'.$arg.'"' : $arg, $command);
+
+        $fullCommand = [];
+        if ([] !== $envVars) {
+            $fullCommand[] = implode(' ', $envVars);
+        }
+        $fullCommand[] = implode(' ', $escapedCommand);
+
+        $debugMessage = \sprintf(
+            "🔍 DEBUG - Commande complète:\n%s\n📁 Working directory: %s",
+            implode(' ', $fullCommand),
+            $cwd ?? getcwd(),
+        );
+
+        $this->mercureService->dispatch(
+            message: $debugMessage,
+            level: Level::Debug,
+        );
     }
 }

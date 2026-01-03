@@ -2,43 +2,56 @@
 
 declare(strict_types=1);
 
-namespace App\Strategy\Step\Service\Start;
+namespace App\Strategy\Step\Service\Build;
 
 use App\Enum\ApplicationStep;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
-use App\Strategy\Step\AbstractStartServiceStepHandler;
+use App\Services\FileSystemEnvironmentServices;
+use App\Services\Mercure\MercureService;
+use App\Services\ProcessRunnerService;
+use App\Strategy\Step\AbstractBuildServiceStepHandler;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class PhpQualityServiceStepHandler extends AbstractStartServiceStepHandler
+final class PhpQualityServiceStepHandler extends AbstractBuildServiceStepHandler
 {
-    public function __construct(private readonly Filesystem $filesystem)
-    {
+    public function __construct(
+        protected FileSystemEnvironmentServices $fileSystemEnvironmentServices,
+        protected MercureService $mercureService,
+        protected ProcessRunnerService $processRunner,
+        private readonly Filesystem $filesystem
+    ) {
+        parent::__construct($fileSystemEnvironmentServices, $mercureService, $processRunner);
     }
 
     public function __invoke(AbstractContainer $serviceContainer, Project $project): void
     {
         $applicationProjectPath = $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer);
+
         $allowVendor = ['allow-plugins.phpstan/extension-installer', 'allow-plugins.phpro/grumphp'];
         foreach ($allowVendor as $vendor) {
             $allowPluginCmd = [
                 'composer',
                 'config',
+                '--no-plugins',
                 '--no-interaction',
                 $vendor,
                 'true',
             ];
 
-            $this->executeInContainer($project, $serviceContainer, $allowPluginCmd, '⚙️ Configuration des plugins Composer');
+            $this->processRunner->run(
+                $allowPluginCmd,
+                '⚙️ Configuration des plugins Composer',
+                $applicationProjectPath,
+                ['XDEBUG_MODE' => 'off']
+            );
         }
 
-        // Then install the packages
         $packagesToInstall = [
             'phpstan/phpstan',
             'friendsofphp/php-cs-fixer',
             'rector/rector',
-            'phpstan/extension-installer',
-            'phpro/grumphp',
+            'phpstan/extension-installer'
         ];
 
         $installCmd = array_merge(
@@ -46,7 +59,12 @@ final class PhpQualityServiceStepHandler extends AbstractStartServiceStepHandler
             $packagesToInstall,
         );
 
-        $this->executeInContainer($project, $serviceContainer, $installCmd, '📦 Ajout des composants de qualités');
+        $this->processRunner->run(
+            $installCmd,
+            '📦 Ajout des composants de qualités',
+            $applicationProjectPath,
+            ['XDEBUG_MODE' => 'off']
+        );
 
         $this->mercureService->dispatch(
             message: '📦 Ajout des fichiers de configuration',
@@ -73,11 +91,7 @@ final class PhpQualityServiceStepHandler extends AbstractStartServiceStepHandler
             $applicationProjectPath.'/.editorconfig',
             true,
         );
-        $this->filesystem->copy(
-            $this->fileSystemEnvironmentServices->getSkeletonFile('quality/grumphp/grumphp.yml'),
-            $applicationProjectPath.'/grumphp.yml',
-            true,
-        );
+
     }
 
     public static function getPriority(): int

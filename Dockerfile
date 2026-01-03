@@ -131,9 +131,6 @@ FROM app_php_dev_xdebug AS app_php_dev
 
 RUN echo "memory_limit = 512M" > /usr/local/etc/php/conf.d/memory-limit.ini
 
-# Déclarer le point de montage pour permettre la surcharge via bind mount
-VOLUME ["/usr/local/bin/docker-entrypoint"]
-
 ENTRYPOINT ["docker-entrypoint"]
 
 
@@ -158,7 +155,8 @@ RUN install-php-extensions zip intl
 COPY --from=docker_cli /usr/local/bin/docker /usr/local/bin/docker
 RUN mkdir -p /usr/local/libexec/docker/cli-plugins
 COPY --from=docker_cli /usr/local/libexec/docker/cli-plugins/docker-compose /usr/local/libexec/docker/cli-plugins/docker-compose
-RUN chmod +x /usr/local/libexec/docker/cli-plugins/docker-compose
+COPY --from=docker_cli /usr/local/libexec/docker/cli-plugins/docker-buildx /usr/local/libexec/docker/cli-plugins/docker-buildx
+RUN chmod +x /usr/local/libexec/docker/cli-plugins/docker-compose /usr/local/libexec/docker/cli-plugins/docker-buildx
 
 # Configuration des permissions Docker avec GID dynamique
 # Le GID doit correspondre au groupe docker de l'hôte pour éviter les erreurs de permissions

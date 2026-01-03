@@ -28,7 +28,7 @@ class ClientController extends AbstractController
     #[Route('/client/', name: 'app_client_list')]
     public function list(): Response
     {
-        $clients = $this->fileSystemEnvironmentServices->getFolder(FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY);
+        $clients = $this->fileSystemEnvironmentServices->getFolder(FileSystemEnvironmentServices::PROJECT_ROOT_FOLDER_IN_DOCKER);
 
         return $this->render('client/list.html.twig', [
             'clients' => $clients,
@@ -144,7 +144,7 @@ class ClientController extends AbstractController
 
         try {
             $normalizedName = $this->clientNameNormalizer->normalize($clientName);
-            $existingClients = $this->fileSystemEnvironmentServices->getFolder(FileSystemEnvironmentServices::PROJECT_IN_GENERATOR_ROOT_DIRECTORY);
+            $existingClients = $this->fileSystemEnvironmentServices->getFolder(FileSystemEnvironmentServices::PROJECT_ROOT_FOLDER_IN_DOCKER);
             $exists = array_any($existingClients, fn ($existingClient): bool => strtolower((string) $existingClient) === strtolower($normalizedName));
 
             if ($exists) {

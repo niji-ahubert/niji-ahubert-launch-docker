@@ -1,7 +1,7 @@
 version: '3'
 dotenv: ['.env']
 vars:
-  PROJECT_ROOT:
+  WSL_PATH_FOLDER_SOCLE_ROOT:
     sh: 'pwd'
   DOCKER_GID:
     sh: 'getent group docker | cut -d: -f3'
@@ -11,6 +11,14 @@ vars:
   ENV_IP_WSL_ETH:
     sh: printenv IP_WSL_ETH
 tasks:
+
+  build-webserver-sf:
+    desc: "🔨 Build webserver PHP container for admin"
+    silent: true
+    cmds:
+      - echo "🔨 Building webserver PHP container..."
+      - 'docker --log-level=ERROR compose -f docker-compose.admin.yml build webserver-php'
+
   assets-compile:
     desc: "🔧 Compile Symfony assets"
     cmds:
@@ -102,7 +110,7 @@ tasks:
       - stop
     cmds:
       - echo "🚀 Start webserver for new project development"
-      - 'IP_WSL_ETH={{.ENV_IP_WSL_ETH}} DOCKER_GID={{.DOCKER_GID}} PROJECT_ROOT={{.PROJECT_ROOT}} PROJECTS_ROOT_HOST={{.PROJECTS_ROOT_HOST}} HOST_UID=$(id -u) HOST_GID=$(id -g) {{.DOCKER_ADMIN_COMP}} --profile webserver up --detach'
+      - 'IP_WSL_ETH={{.ENV_IP_WSL_ETH}} DOCKER_GID={{.DOCKER_GID}} WSL_PATH_FOLDER_SOCLE_ROOT={{.WSL_PATH_FOLDER_SOCLE_ROOT}} WSL_PATH_FOLDER_PROJECTS_ROOT={{.WSL_PATH_FOLDER_PROJECTS_ROOT}} HOST_UID=$(id -u) HOST_GID=$(id -g) {{.DOCKER_ADMIN_COMP}} --profile webserver up --detach'
       - echo "🌐 Votre application est disponible sur https://niji-generator.docker.localhost"
 
   stop:

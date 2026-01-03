@@ -35,18 +35,13 @@ final readonly class PhpDockerService extends AbstractDockerService
 
     protected function getServiceSkeleton(string $volumeName, AbstractContainer $service, Project $project): array
     {
-        /*
-             labels:
-              - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}.rule=Host(`${URL_LOCAL_WEBSITE}`)
-              - traefik.enable=true
-              - traefik.http.services.${CLIENT}-${PROJECT}${FOLDER_NAME}.loadbalancer.server.port=${PORT_NUMBER:-9000}
-              - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}.tls=true
-         */
         $configPhp = [
             'container_name' => \sprintf('%s-%s-%s-%s', $project->getClient(), $project->getProject(), $service->getFolderName(), $project->getEnvironmentContainer()->value),
             'image' => \sprintf('%s-%s-%s-%s', $project->getClient(), $project->getProject(), $service->getFolderName(), $project->getEnvironmentContainer()->value),
+            'profiles' => ['runner-dev'],
+            'working_dir' => \sprintf('${PROJECT_ROOT_FOLDER_IN_DOCKER}/%s/%s/%s', $project->getClient(), $project->getProject(), $service->getFolderName()),
             'extends' => [
-                'file' => \sprintf('${PROJECT_ROOT}/resources/docker-compose/%s.docker-compose.yml', $service->getServiceContainer()->value),
+                'file' => \sprintf('${WSL_PATH_FOLDER_SOCLE_ROOT}/resources/docker-compose/%s.docker-compose.yml', $service->getServiceContainer()->value),
                 'service' => \sprintf('%s-%s', $service->getServiceContainer()->value, $project->getEnvironmentContainer()->value),
             ],
             'env_file' => [
@@ -54,14 +49,14 @@ final readonly class PhpDockerService extends AbstractDockerService
                 \sprintf('./%s/.env.niji-launcher', $service->getFolderName()),
             ],
             'build' => [
-                'context' => \sprintf('${PROJECTS_ROOT_CONTEXT:-${PROJECT_ROOT}/projects}/%1$s/%2$s/%3$s', $project->getClient(), $project->getProject(), $service->getFolderName()),
+                'context' => \sprintf('${PROJECT_ROOT_FOLDER_IN_DOCKER}/%1$s/%2$s/%3$s', $project->getClient(), $project->getProject(), $service->getFolderName()),
             ],
             'volumes' => [
                 \sprintf(
-                    '${PROJECTS_ROOT_HOST:-${PROJECT_ROOT}/projects}/%1$s/%2$s/%3$s:/var/www/html/projects/%1$s/%2$s/%3$s:rw',
+                    '${WSL_PATH_FOLDER_PROJECTS_ROOT}/%1$s/%2$s/%3$s:${PROJECT_ROOT_FOLDER_IN_DOCKER}/%1$s/%2$s/%3$s:rw',
                     $project->getClient(),
                     $project->getProject(),
-                    $service->getFolderName(),
+                    $service->getFolderName()
                 ),
             ],
             'labels' => [
