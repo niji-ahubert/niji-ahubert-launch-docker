@@ -25,28 +25,6 @@ tasks:
     cmds:
       - '{{.DOCKER_ADMIN_COMP}} ps --services'
 
-  composer-audit:
-    desc: "🔍 Run composer audit"
-    silent: true
-    internal: true
-    vars:
-      SERVICE_NAME:
-        sh: '{{if .SERVICE_NAME}}echo {{.SERVICE_NAME}}{{else}}task service-running | gum choose{{end}}'
-    cmds:
-      - echo "🔒 Running Security Check..."
-      - 'docker run --rm --interactive --tty --user $(id -u):$(id -g) --env GIT_SAFE_DIRECTORY=* --volume $PWD:/app composer audit'
-
-  composer-outdated:
-    desc: "🔍 Check for outdated packages"
-    silent: true
-    internal: true
-    vars:
-      SERVICE_NAME:
-        sh: '{{if .SERVICE_NAME}}echo {{.SERVICE_NAME}}{{else}}task service-running | gum choose{{end}}'
-    cmds:
-      - echo "🔒 Checking for outdated packages..."
-      - 'docker run --rm --interactive --tty --user $(id -u):$(id -g) --env GIT_SAFE_DIRECTORY=* --volume $PWD:/app composer outdated'
-
   security:
     desc: "🔒 Run Trivy security scan"
     silent: true
@@ -54,59 +32,6 @@ tasks:
     cmds:
       - echo "🔒 Running Trivy security scan..."
       - 'docker run --rm -v $(pwd):/app -v ${HOME}/.trivy/.cache:/root/.cache/ -w /app aquasec/trivy:latest --exit-code 1 fs --scanners vuln .'
-
-  phpstan:
-    desc: "🔍 Run phpstan"
-    silent: true
-    internal: true
-    vars:
-      SERVICE_NAME:
-        sh: '{{if .SERVICE_NAME}}echo {{.SERVICE_NAME}}{{else}}task service-running | gum choose{{end}}'
-    cmds:
-      - echo "🔍 Running PHPStan..."
-      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.SERVICE_NAME}} vendor/bin/phpstan analyse src --memory-limit=-1'
-
-  rector:
-    desc: "🔍 Run rector "
-    silent: true
-    internal: true
-    vars:
-      SERVICE_NAME:
-        sh: '{{if .SERVICE_NAME}}echo {{.SERVICE_NAME}}{{else}}task service-running | gum choose{{end}}'
-    cmds:
-      - echo "🔍 Running Rector... {{.SERVICE_NAME}}"
-      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.SERVICE_NAME}} vendor/bin/rector process --config rector.php'
-
-  phpcsfixer:
-    desc: "🔍 Run php-cs-fixer"
-    silent: true
-    internal: true
-    vars:
-      SERVICE_NAME:
-        sh: '{{if .SERVICE_NAME}}echo {{.SERVICE_NAME}}{{else}}task service-running | gum choose{{end}}'
-    cmds:
-      - echo "🔍 Running PHP-CS-Fixer..."
-      - '{{.DOCKER_ADMIN_COMP}} exec -e XDEBUG_MODE=off {{.SERVICE_NAME}} vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --diff'
-
-  qa:
-    desc: "🔍 Run quality assurance tools"
-    silent: true
-    vars:
-      SERVICE_NAME:
-        sh: task service-running | gum choose
-    cmds:
-      - task: rector
-        vars: { SERVICE_NAME: "{{.SERVICE_NAME}}" }
-      - task: phpcsfixer
-        vars: { SERVICE_NAME: "{{.SERVICE_NAME}}" }
-      - task: phpstan
-        vars: { SERVICE_NAME: "{{.SERVICE_NAME}}" }
-      - task: security
-      - task: composer-audit
-        vars: { SERVICE_NAME: "{{.SERVICE_NAME}}" }
-      - task: composer-outdated
-        vars: { SERVICE_NAME: "{{.SERVICE_NAME}}" }
-
 
   bash:
     desc: "🐚 Start a bash shell in webserver for new project"

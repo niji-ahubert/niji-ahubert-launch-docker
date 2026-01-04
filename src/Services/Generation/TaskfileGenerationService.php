@@ -4,22 +4,32 @@ declare(strict_types=1);
 
 namespace App\Services\Generation;
 
+use App\Enum\ContainerType\ProjectContainer;
 use App\Enum\Log\TypeLog;
 use App\Model\Project;
 use App\Services\FileSystemEnvironmentServices;
 use App\Services\Mercure\MercureService;
+use App\Services\Taskfile\TaskfileFile;
+use App\Services\Taskfile\TaskfileTaskProviderInterface;
 use App\Util\DockerUtility;
 use Monolog\Level;
 use Symfony\Bundle\MakerBundle\Generator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Filesystem\Filesystem;
 
 final readonly class TaskfileGenerationService
 {
+    /**
+     * @param iterable<TaskfileTaskProviderInterface> $taskProviders
+     */
     public function __construct(
         private FileSystemEnvironmentServices $fileSystemEnvironmentServices,
         private MercureService $mercureService,
         private Generator $makerGenerator,
         private Filesystem $filesystem,
+        private TaskfileFile $taskfileFile,
+        #[AutowireIterator(TaskfileTaskProviderInterface::class)]
+        private iterable $taskProviders,
         private string $wslPathFolderSocleRoot,
         private string $wslPathFolderProjectsRoot,
     ) {
@@ -53,15 +63,16 @@ final readonly class TaskfileGenerationService
                 '{{PROJECT}}' => $project->getProject(),
             ];
 
-            // Apply replacements
             $generatedContent = str_replace(
                 array_keys($replacements),
                 array_values($replacements),
                 $templateContent,
             );
 
-            // Write the generated content to the target file
             $this->filesystem->dumpFile($taskfileConfigPath, $generatedContent);
+
+            $this->addContainerSpecificTasks($project);
+
             $this->makerGenerator->writeChanges();
 
             $this->mercureService->dispatch(
@@ -75,5 +86,34 @@ final readonly class TaskfileGenerationService
                 error: $exception->getMessage(),
             );
         }
+    }
+
+    private function addContainerSpecificTasks(Project $project): void
+    {
+        $taskfileManipulator = $this->taskfileFile->getTaskfile($project);
+        $addedContainerTypes = [];
+
+        foreach ($project->getServiceContainer() as $service) {
+            $containerType = $service->getServiceContainer();
+
+            if (!$containerType instanceof ProjectContainer) {
+                continue;
+            }
+
+            if (\in_array($containerType, $addedContainerTypes, true)) {
+                continue;
+            }
+
+            foreach ($this->taskProviders as $provider) {
+                if ($provider->supports($containerType)) {
+                    $taskfileManipulator->addTasks($provider->getTasks());
+                    $addedContainerTypes[] = $containerType;
+                    break;
+                }
+            }
+        }
+
+        $taskfileConfigPath = $this->fileSystemEnvironmentServices->getProjectTaskFilePath($project);
+        $this->filesystem->dumpFile($taskfileConfigPath, $taskfileManipulator->getDataString());
     }
 }

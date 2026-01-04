@@ -34,6 +34,7 @@ final readonly class LaravelServiceStrategy extends AbstractServiceStrategy
             ApplicationStep::ACCESS_RIGHT,
             ApplicationStep::CONFIGURATION_WEBSERVER,
             ApplicationStep::PHP_QUALITY,
+            ApplicationStep::ENV_FILE_APPLICATION,
         ];
     }
 

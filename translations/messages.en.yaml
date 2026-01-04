@@ -248,8 +248,9 @@ version:
     '23': "Node.js 23"
     '24': "Node.js 24"
   laravel:
+    '13': "Laravel 13"
+    '12': "Laravel 12"
     '11': "Laravel 11"
-    '10': "Laravel 10"
   symfony:
     '7.1': "Symfony 7.1"
     '6.4': "Symfony 6.4"

@@ -15,14 +15,16 @@ enum VersionLaravelSupported: string implements TranslatableInterface, VersionFr
 {
     use UtilityTrait;
 
+    case LA13 = '13.0';
+    case LA12 = '12.0';
     case LA11 = '11.0';
-    case LA10 = '10.0';
 
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
         return match ($this) {
+            self::LA13 => $translator->trans('version.laravel.13', locale: $locale),
+            self::LA12 => $translator->trans('version.laravel.12', locale: $locale),
             self::LA11 => $translator->trans('version.laravel.11', locale: $locale),
-            self::LA10 => $translator->trans('version.laravel.10', locale: $locale),
         };
     }
 }
