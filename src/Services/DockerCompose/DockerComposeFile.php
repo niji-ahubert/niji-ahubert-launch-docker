@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\DockerCompose;
 
+use App\Enum\ContainerType\ProjectContainer;
 use App\Model\Project;
 use App\Services\FileSystemEnvironmentServices;
 use Symfony\Bundle\MakerBundle\Generator;
@@ -39,12 +40,33 @@ final readonly class DockerComposeFile
     {
         $this->dockerComposeFileManipulator->initialize();
         $this->dockerComposeFileManipulator->setGlobalNetworkComposeData($project->getTraefikNetwork());
-        $this->dockerComposeFileManipulator->setGlobalVolumeComposeData('composer-cache', 'composer-cache');
+
+        $volumeNames = $this->getVolumeNameForProject($project);
+        foreach ($volumeNames as $volumeName) {
+            $this->dockerComposeFileManipulator->setGlobalVolumeComposeData($volumeName, $volumeName);
+        }
 
         $this->makerGenerator->dumpFile($dockerFile, $this->dockerComposeFileManipulator->getDataString());
         $this->makerGenerator->writeChanges();
 
         return $this->dockerComposeFileManipulator;
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function getVolumeNameForProject(Project $project): array
+    {
+        foreach ($project->getServiceContainer() as $container) {
+            if ($container->getServiceContainer() instanceof ProjectContainer) {
+                return match ($container->getServiceContainer()) {
+                    ProjectContainer::PHP => ['composer-cache'],
+                    ProjectContainer::NODE => ['npm-cache', 'pnpm-cache'],
+                };
+            }
+        }
+
+        return ['composer-cache'];
     }
 
     private function getContentDockerComposeFile(string $dockerFile): DockerComposeFileManipulator

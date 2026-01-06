@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enum\Log\LoggerChannel;
-use App\Enum\WebServer;
+use App\Enum\WebServerPhp;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use Symfony\Bundle\MakerBundle\Generator;
@@ -180,7 +180,7 @@ final class FileSystemEnvironmentServices
         return \sprintf('%s/%s', $this->getPathProject($project), self::DOCKER_FOLDER);
     }
 
-    public function getProjectDockerFolderWebserver(Project $project, WebServer $webServer): string
+    public function getProjectDockerFolderWebserver(Project $project, WebServerPhp $webServer): string
     {
         return \sprintf('%s/%s/%s', $this->getPathProject($project), self::DOCKER_FOLDER, $webServer->getValue());
     }
@@ -361,7 +361,7 @@ final class FileSystemEnvironmentServices
 
     public function getApplicationNginxConfigPath(Project $project, AbstractContainer $serviceContainer): string
     {
-        return \sprintf('%s/%s-%s', $this->getProjectDockerFolderWebserver($project, WebServer::NGINX), $serviceContainer->getFolderName(), self::NGINX_CONFIG_NAME);
+        return \sprintf('%s/%s-%s', $this->getProjectDockerFolderWebserver($project, WebServerPhp::NGINX), $serviceContainer->getFolderName(), self::NGINX_CONFIG_NAME);
     }
 
     public function getNginxSkeletonFile(): string
@@ -414,6 +414,11 @@ EOF;
 
         $this->filesystem->dumpFile(\sprintf('%s/%s', $folderPath, self::GITKEEP), '');
         $this->filesystem->dumpFile(\sprintf('%s/%s', $folderPath, self::GITIGNORE), $gitIgnoreContent);
+    }
+
+    public function getProjectDir(): string
+    {
+        return $this->projectDir;
     }
 
     private function initializePathProject(Project $projectEnvironment): void

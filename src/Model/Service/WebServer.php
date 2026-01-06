@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Service;
 
-use App\Enum\WebServer as EnumWebserver;
+use App\Enum\WebServerPhp as EnumWebserver;
 
 final class WebServer
 {

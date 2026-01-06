@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Strategy\DockerService;
 
 use App\Enum\ContainerType\ServiceContainer;
-use App\Enum\WebServer;
+use App\Enum\WebServerPhp;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Services\FileSystemEnvironmentServices;
@@ -26,14 +26,14 @@ final readonly class NginxDockerService extends AbstractDockerService
 
     protected function getServiceSkeleton(string $volumeName, AbstractContainer $service, Project $project): array
     {
-        $dependsOn = DockerComposeUtility::getContainerWebserver($project, WebServer::NGINX);
+        $dependsOn = DockerComposeUtility::getContainerWebserver($project, WebServerPhp::NGINX);
 
         $serviceSkeleton = [
             'image' => \sprintf('%s:%s', ServiceContainer::NGINX->getValue(), $service->getDockerVersionService()),
             'container_name' => \sprintf('%s_service', ServiceContainer::NGINX->getValue()),
             'volumes' => [
                 \sprintf('%s:/data', $volumeName),
-                \sprintf('%s:/etc/nginx/conf.d/', str_replace(FileSystemEnvironmentServices::PROJECT_ROOT_FOLDER_IN_DOCKER, '${WSL_PATH_FOLDER_PROJECTS_ROOT}', $this->fileSystemEnvironmentServices->getProjectDockerFolderWebserver($project, WebServer::NGINX))),
+                \sprintf('%s:/etc/nginx/conf.d/', str_replace(FileSystemEnvironmentServices::PROJECT_ROOT_FOLDER_IN_DOCKER, '${WSL_PATH_FOLDER_PROJECTS_ROOT}', $this->fileSystemEnvironmentServices->getProjectDockerFolderWebserver($project, WebServerPhp::NGINX))),
                 ...$this->extractProjectVolume($project),
             ],
             'profiles' => ['runner-dev'],
@@ -82,7 +82,7 @@ final readonly class NginxDockerService extends AbstractDockerService
             if ($container->getServiceContainer() instanceof ServiceContainer) {
                 continue;
             }
-            if (WebServer::NGINX === $container->getWebServer()?->getWebServer()) {
+            if (WebServerPhp::NGINX === $container->getWebServer()?->getWebServer()) {
                 $hosts[] = \sprintf('Host(`%s`)', $container->getUrlService());
             }
         }

@@ -5,13 +5,7 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-WORKDIR /app
-
-# Copie des fichiers de définition des dépendances
-COPY package.json pnpm-lock.yaml* ./
-
-# Installation des dépendances
-RUN pnpm install
+WORKDIR /var/www/html
 
 # Copie le reste du code source
 COPY . .
@@ -21,3 +15,7 @@ EXPOSE <?= $port ?>
 
 # Commande par défaut pour démarrer l'application
 CMD ["pnpm", "start"]
+
+FROM stage_dev AS stage_prod
+COPY . /var/www/html
+RUN pnpm install --prod --frozen-lockfile

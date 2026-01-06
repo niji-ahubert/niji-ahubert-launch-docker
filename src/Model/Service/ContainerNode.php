@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Model\Service;
 
 use App\Enum\ContainerType\ProjectContainer;
+use App\Enum\Framework\FrameworkLanguageNode;
+use App\Enum\Framework\FrameworkLanguagePhp;
 use App\Enum\ServiceVersion\VersionNodeSupported;
 use App\Enum\ServiceVersion\VersionServiceSupportedInterface;
-use App\Enum\WebServer;
+use App\Enum\WebServerNode;
+use App\Enum\WebServerPhp;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Webmozart\Assert\Assert;
 
@@ -18,7 +21,8 @@ final class ContainerNode extends AbstractContainer
     {
         $this->versionSupported = VersionNodeSupported::values();
         $this->serviceContainer = ProjectContainer::NODE;
-        $this->webserverSupported = [WebServer::NGINX->value, WebServer::APACHE->value];
+        $this->frameworkSupported = FrameworkLanguageNode::values();
+        $this->webserverSupported = WebServerNode::values();
         $this->dockerVersionService = VersionNodeSupported::NODE24->value;
         parent::__construct();
     }

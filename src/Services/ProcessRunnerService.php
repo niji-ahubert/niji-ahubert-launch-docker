@@ -41,7 +41,7 @@ final readonly class ProcessRunnerService
 
         $process = new Process($command, $applicationProjectPath);
         $process->setTimeout(null);
-        $process->setIdleTimeout(60);
+        $process->setIdleTimeout(300);
 
         $process->run(function ($type, $buffer): void {
             $primaryChunks = preg_split("/(\r\n|\r|\n)/", $buffer) ?: [];

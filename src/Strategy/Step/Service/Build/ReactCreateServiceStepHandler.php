@@ -1,0 +1,82 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Strategy\Step\Service\Build;
+
+use App\Enum\ApplicationStep;
+use App\Model\Project;
+use App\Model\Service\AbstractContainer;
+use App\Services\FileSystemEnvironmentServices;
+use App\Services\Mercure\MercureService;
+use App\Services\ProcessRunnerService;
+use App\Strategy\Step\AbstractBuildServiceStepHandler;
+use Monolog\Level;
+
+final class ReactCreateServiceStepHandler extends AbstractBuildServiceStepHandler
+{
+    public function __construct(
+        FileSystemEnvironmentServices $fileSystemEnvironmentServices,
+        MercureService $mercureService,
+        ProcessRunnerService $processRunner,
+        string $hostUid,
+        string $hostGid,
+        string $wslPathFolderSocleRoot,
+        string $wslPathFolderProjectsRoot,
+    ) {
+        parent::__construct(
+            $fileSystemEnvironmentServices,
+            $mercureService,
+            $processRunner,
+            $hostUid,
+            $hostGid,
+            $wslPathFolderSocleRoot,
+            $wslPathFolderProjectsRoot,
+        );
+    }
+
+    public function __invoke(AbstractContainer $serviceContainer, Project $project): void
+    {
+        $applicationProjectPath = $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer);
+
+        if (false === $this->fileSystemEnvironmentServices->isDirectoryEmpty($applicationProjectPath)) {
+            $this->mercureService->dispatch(
+                message: \sprintf('Le dossier %s n\'est pas vide, l\'opération Création du projet React est annulée', $applicationProjectPath),
+                level: Level::Warning,
+            );
+
+            return;
+        }
+
+        $nodeVersion = $serviceContainer->getDockerVersionService() ?? '20';
+
+        $command = [
+            'docker',
+            'run',
+            '--rm',
+            '--user', \sprintf('%s:%s', $this->hostUid, $this->hostGid),
+            '--volume', \sprintf('%s:/app', $this->resolveHostPath($applicationProjectPath)),
+            '--workdir', '/app',
+            \sprintf('node:%s-alpine', $nodeVersion),
+            'sh',
+            '-c',
+            'npm create vite@latest . -- --template react-ts',
+        ];
+
+        $this->processRunner->run(
+            $command,
+            '⚙️ Création du projet React',
+            $applicationProjectPath,
+        );
+    }
+
+    public static function getPriority(): int
+    {
+        return 4;
+    }
+
+    public function getStepName(): ApplicationStep
+    {
+        return ApplicationStep::REACT_CREATE;
+    }
+}

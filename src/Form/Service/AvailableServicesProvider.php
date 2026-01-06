@@ -6,7 +6,7 @@ namespace App\Form\Service;
 
 use App\Enum\ContainerType\ProjectContainer;
 use App\Enum\DataStorage;
-use App\Enum\WebServer;
+use App\Enum\WebServerPhp;
 use App\Model\Project;
 use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -42,15 +42,15 @@ final readonly class AvailableServicesProvider
     }
 
     /**
-     * @return WebServer[]
+     * @return WebServerPhp[]
      */
     public function getAvailableWebServers(Project $project): array
     {
-        $availableWebServers = [WebServer::LOCAL];
+        $availableWebServers = [WebServerPhp::LOCAL];
 
         foreach ($project->getServiceContainer() as $container) {
             $serviceName = strtolower($container->getName());
-            $webServerEnum = WebServer::tryFrom($serviceName);
+            $webServerEnum = WebServerPhp::tryFrom($serviceName);
 
             if ($webServerEnum && !\in_array($webServerEnum, $availableWebServers, true)) {
                 $availableWebServers[] = $webServerEnum;

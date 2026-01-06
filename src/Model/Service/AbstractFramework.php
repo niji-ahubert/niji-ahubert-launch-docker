@@ -10,6 +10,8 @@ use App\Enum\Framework\FrameworkLanguageNode;
 use App\Enum\Framework\FrameworkLanguagePhp;
 use App\Enum\ServiceVersion\VersionFrameworkSupportedInterface;
 use App\Enum\ServiceVersion\VersionLaravelSupported;
+use App\Enum\ServiceVersion\VersionNestSupported;
+use App\Enum\ServiceVersion\VersionNextSupported;
 use App\Enum\ServiceVersion\VersionReactSupported;
 use App\Enum\ServiceVersion\VersionSymfonySupported;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
@@ -19,11 +21,13 @@ use Symfony\Component\Uid\Uuid;
 
 #[AutoconfigureTag()]
 #[DiscriminatorMap(
-    typeProperty: 'type',
+    typeProperty: 'name',
     mapping: [
         FrameworkLanguagePhp::PHP->value => FrameworkPhp::class,
         FrameworkLanguagePhp::LARAVEL->value => FrameworkLaravel::class,
         FrameworkLanguagePhp::SYMFONY->value => FrameworkSymfony::class,
+        FrameworkLanguageNode::NEXT->value => FrameworkNext::class,
+        FrameworkLanguageNode::NEST->value => FrameworkNest::class,
     ],
 )]
 abstract class AbstractFramework
@@ -61,7 +65,7 @@ abstract class AbstractFramework
     abstract public function getFrameworkEnum(string $stringEnumValue): ?FrameworkLanguageInterface;
 
     /**
-     * @phpstan-return VersionFrameworkSupportedInterface<VersionSymfonySupported|VersionReactSupported|VersionLaravelSupported>|null
+     * @phpstan-return VersionFrameworkSupportedInterface<VersionSymfonySupported|VersionReactSupported|VersionLaravelSupported|VersionNextSupported|VersionNestSupported>|null
      */
     abstract public function getVersionFrameworkEnum(): ?VersionFrameworkSupportedInterface;
 

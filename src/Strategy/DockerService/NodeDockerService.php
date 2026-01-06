@@ -18,12 +18,14 @@ final readonly class NodeDockerService extends AbstractDockerService
 
     protected function getServiceSkeleton(string $volumeName, AbstractContainer $service, Project $project): array
     {
-        return [
-            'profiles' => ['runner-dev'],
-            'extends' => [
-                'file' => \sprintf('${WSL_PATH_FOLDER_SOCLE_ROOT}/resources/docker-compose/%s.docker-compose.yml', $service->getServiceContainer()->value),
-                'service' => \sprintf('%s-%s', $service->getServiceContainer()->value, Environment::DEV->value),
-            ],
-        ];
+        $config = $this->getBaseServiceConfig($service, $project);
+        $config['labels'] = $this->getTraefikLabels($service);
+
+        $dependsOn = $this->getDatabaseDependencies($service, $project);
+        if ([] !== $dependsOn) {
+            $config['depends_on'] = $dependsOn;
+        }
+
+        return $config;
     }
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Strategy\Webserver;
 
 use App\Enum\ContainerType\ProjectContainer;
-use App\Enum\WebServer;
+use App\Enum\WebServerPhp;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 use App\Util\DockerComposeUtility;
@@ -35,6 +35,6 @@ final class NginxConfiguration extends abstractConfiguration
     public function support(AbstractContainer $serviceContainer): bool
     {
         return ProjectContainer::PHP === $serviceContainer->getServiceContainer()
-            && WebServer::NGINX === $serviceContainer->getWebServer()?->getWebServer();
+            && WebServerPhp::NGINX === $serviceContainer->getWebServer()?->getWebServer();
     }
 }

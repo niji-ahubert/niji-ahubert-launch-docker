@@ -9,7 +9,7 @@ use App\Enum\Framework\FrameworkLanguagePhp;
 use App\Enum\PhpExtension;
 use App\Enum\ServiceVersion\VersionPhpSupported;
 use App\Enum\ServiceVersion\VersionServiceSupportedInterface;
-use App\Enum\WebServer;
+use App\Enum\WebServerPhp;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Webmozart\Assert\Assert;
 
@@ -22,7 +22,7 @@ final class ContainerPhp extends AbstractContainer
         $this->serviceContainer = ProjectContainer::PHP;
         $this->frameworkSupported = FrameworkLanguagePhp::values();
         $this->extensionSupported = PhpExtension::values();
-        $this->webserverSupported = WebServer::values();
+        $this->webserverSupported = WebServerPhp::values();
         $this->dockerVersionService = VersionPhpSupported::PHP83->value;
         parent::__construct();
     }

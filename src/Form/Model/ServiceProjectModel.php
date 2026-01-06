@@ -21,7 +21,7 @@ use App\Enum\ServiceVersion\VersionReactSupported;
 use App\Enum\ServiceVersion\VersionRedisSupported;
 use App\Enum\ServiceVersion\VersionServiceSupportedInterface;
 use App\Enum\ServiceVersion\VersionSymfonySupported;
-use App\Enum\WebServer;
+use App\Enum\WebServerPhp;
 use App\Validator\Constraints\ValidFrameworkLanguage;
 use App\Validator\Constraints\ValidVersionFramework;
 use App\Validator\Constraints\ValidVersionService;
@@ -83,10 +83,10 @@ class ServiceProjectModel
 
     #[Assert\NotNull(message: 'validator.service.webserver_required')]
     #[Assert\Choice(
-        callback: [WebServer::class, 'cases'],
+        callback: [WebServerPhp::class, 'cases'],
         message: 'validator.service.webserver_choice',
     )]
-    private ?WebServer $webServer = null;
+    private ?WebServerPhp $webServer = null;
 
     //    #[Assert\All([
     //        new Assert\Choice(
@@ -140,7 +140,7 @@ class ServiceProjectModel
         return $this->versionService;
     }
 
-    public function getWebServer(): ?WebServer
+    public function getWebServer(): ?WebServerPhp
     {
         return $this->webServer;
     }
@@ -258,7 +258,7 @@ class ServiceProjectModel
         return $this;
     }
 
-    public function setWebServer(?WebServer $webServer): self
+    public function setWebServer(?WebServerPhp $webServer): self
     {
         $this->webServer = $webServer;
 

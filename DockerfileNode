@@ -1,0 +1,130 @@
+# syntax=docker/dockerfile:1
+ARG NODE_VERSION=20
+
+FROM docker:latest AS docker_cli
+
+FROM node:${NODE_VERSION}-bookworm-slim AS app_node_base
+
+ENV NODE_VERSION $NODE_VERSION
+ENV DOCKER_ENV "prod"
+
+WORKDIR /var/www/html
+
+ARG HOST_UID=1000
+ARG HOST_GID=1000
+
+RUN set -x ; \
+    if getent group ${HOST_GID} > /dev/null 2>&1; then \
+        GROUP_NAME=$(getent group ${HOST_GID} | cut -d: -f1); \
+    else \
+        groupadd -g ${HOST_GID} admin; \
+        GROUP_NAME=admin; \
+    fi; \
+    if getent passwd ${HOST_UID} > /dev/null 2>&1; then \
+        USER_NAME=$(getent passwd ${HOST_UID} | cut -d: -f1); \
+        usermod -aG node ${USER_NAME}; \
+        if [ "${GROUP_NAME}" != "$(id -gn ${USER_NAME})" ]; then \
+            usermod -g ${GROUP_NAME} ${USER_NAME}; \
+        fi; \
+    else \
+        useradd -u ${HOST_UID} -g ${GROUP_NAME} -G node -m admin; \
+    fi;
+
+## PACKAGE DEBIAN
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    --mount=type=cache,target=/var/cache/apt/archives \
+    set -eux; \
+    apt-get update && apt-get install -y \
+    bash \
+    git \
+    ca-certificates \
+    tini \
+    unzip;
+## END PACKAGE DEBIAN
+
+## PNPM
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+## END PNPM
+
+RUN set -x ; \
+    mkdir -p /pnpm; \
+    mkdir -p /pnpm-cache; \
+    mkdir -p /npm-cache; \
+    chown -R ${HOST_UID}:node /pnpm; \
+    chown -R ${HOST_UID}:node /pnpm-cache; \
+    chown -R ${HOST_UID}:node /npm-cache;
+
+ENV PNPM_CACHE_DIR /pnpm-cache
+
+COPY resources/docker/entrypoint/docker-entrypoint-node.sh /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+
+## CLEAN
+RUN rm -rf /tmp/* /var/cache/apt/* /var/tmp/*
+LABEL authors="niji-dsf"
+
+### PROD LAYER ###
+FROM app_node_base AS app_node_prod
+
+ARG PROJECT
+ARG CLIENT
+COPY projects/$CLIENT/$PROJECT/application /var/www/html
+
+ENV DOCKER_ENV="prod"
+ENV NODE_ENV=production
+
+RUN pnpm install --frozen-lockfile --prod
+
+ENTRYPOINT ["/usr/bin/tini", "--", "docker-entrypoint"]
+CMD ["pnpm", "start"]
+
+### DEV LAYER ###
+FROM app_node_base AS app_node_dev
+
+ENV DOCKER_ENV "dev"
+ENV NODE_ENV "development"
+
+## ADD SSH
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    --mount=type=cache,target=/var/cache/apt/archives \
+    apt-get update && apt-get install -y openssh-client
+## END ADD SSH
+
+## DEV TOOLS
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    --mount=type=cache,target=/var/cache/apt/archives \
+    apt-get update && apt-get install -y \
+    procps \
+    vim \
+    curl
+## END DEV TOOLS
+
+ENTRYPOINT ["/usr/bin/tini", "--", "docker-entrypoint"]
+CMD ["tail", "-f", "/dev/null"]
+
+FROM app_node_dev AS niji_generator_common_node
+
+RUN mkdir -p /opt/envfile /var/www/html && \
+    chown -R admin:admin /opt/envfile /var/www/html
+
+ENV DOCKER_GID=997
+
+WORKDIR /opt/envfile
+
+COPY --from=docker_cli /usr/local/bin/docker /usr/local/bin/docker
+RUN mkdir -p /usr/local/libexec/docker/cli-plugins
+COPY --from=docker_cli /usr/local/libexec/docker/cli-plugins/docker-compose /usr/local/libexec/docker/cli-plugins/docker-compose
+COPY --from=docker_cli /usr/local/libexec/docker/cli-plugins/docker-buildx /usr/local/libexec/docker/cli-plugins/docker-buildx
+RUN chmod +x /usr/local/libexec/docker/cli-plugins/docker-compose /usr/local/libexec/docker/cli-plugins/docker-buildx
+
+ARG DOCKER_GID=997
+RUN --mount=type=cache,target=/var/lib/apt/lists \
+    --mount=type=cache,target=/var/cache/apt/archives \
+    apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && groupadd -f -g ${DOCKER_GID} docker \
+    && usermod -aG ${DOCKER_GID} admin \
+    && usermod -aG ${DOCKER_GID} node
+
+USER admin

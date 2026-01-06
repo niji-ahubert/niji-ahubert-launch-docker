@@ -247,6 +247,15 @@ version:
     '22': "Node.js 22"
     '23': "Node.js 23"
     '24': "Node.js 24"
+  nest:
+    '10': "NestJS 10"
+    '11': "NestJS 11"
+  next:
+    '15': "Next.js 15"
+    '16': "Next.js 16"
+  react:
+    '18': "React 18"
+    '19': "React 19"
   laravel:
     '13': "Laravel 13"
     '12': "Laravel 12"
@@ -263,6 +272,8 @@ framework:
       laravel: "Laravel"
       custom: "Custom PHP"
     node:
+      nest: "NestJS"
+      next: "Next.js"
       react: "React"
       javascript: "JavaScript"
 

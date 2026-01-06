@@ -116,8 +116,11 @@ final readonly class BuildImageProjectService
         $objDocker = DockerUtility::getDockerfileVariable($service, $project);
 
         if ($objDocker instanceof DockerData && !DockerUtility::dockerImageExists($objDocker->getImageName())) {
+            $serviceType = $service->getServiceContainer()->value;
+            $buildServiceName = \sprintf('build-%s-%s', $serviceType, $project->getEnvironmentContainer()->value);
+            
             $command = ['docker', '--log-level=ERROR', 'compose', '-f', 'docker-compose.admin.yml', '--profile', 'builder', 'build'];
-            $command[] = \sprintf('build-php-%s', $project->getEnvironmentContainer()->value);
+            $command[] = $buildServiceName;
 
             $envVars = $this->envFileGeneratorService->generateSocleEnv($service, $project);
 
@@ -145,6 +148,7 @@ final readonly class BuildImageProjectService
         $env = EnvVarUtility::loadEnvironmentVariables($this->fileSystemEnvironmentServices->getComponentEnvFile($project, $service));
         //specific override to build form socle container
         $env['WSL_PATH_FOLDER_SOCLE_ROOT'] = FileSystemEnvironmentServices::DOCKER_ROOT_DIRECTORY;
+        $env['WSL_PATH_FOLDER_PROJECTS_ROOT'] = FileSystemEnvironmentServices::PROJECT_ROOT_FOLDER_IN_DOCKER;
         $env['PROJECT_ROOT_FOLDER_IN_DOCKER'] = FileSystemEnvironmentServices::PROJECT_ROOT_FOLDER_IN_DOCKER;
         $env['DOCKER_BUILDKIT'] = '1';
         $env['COMPOSE_DOCKER_CLI_BUILD'] = '1';

@@ -42,7 +42,7 @@ final readonly class PostgresqlDockerService extends AbstractDatabaseDockerServi
     {
         return [
             'image' => \sprintf('%s:%s', ServiceContainer::PGSQL->getValue(), $service->getDockerVersionService()),
-            'container_name' => \sprintf('%s_service_database', ServiceContainer::PGSQL->getValue()),
+            'container_name' => \sprintf('%s_%s_%s_service', $project->getClient(), $project->getProject(), $this->getServiceContainer()->value),
             'profiles' => ['runner-dev'],
             'networks' => ['traefik'],
             'volumes' => [\sprintf('%s:/var/lib/postgresql/data', $volumeName)],

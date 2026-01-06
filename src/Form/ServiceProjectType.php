@@ -11,10 +11,13 @@ use App\Enum\Framework\FrameworkLanguageNode;
 use App\Enum\Framework\FrameworkLanguagePhp;
 use App\Enum\PhpExtension;
 use App\Enum\ServiceVersion\VersionLaravelSupported;
+use App\Enum\ServiceVersion\VersionNestSupported;
+use App\Enum\ServiceVersion\VersionNextSupported;
 use App\Enum\ServiceVersion\VersionNodeSupported;
 use App\Enum\ServiceVersion\VersionPhpSupported;
+use App\Enum\ServiceVersion\VersionReactSupported;
 use App\Enum\ServiceVersion\VersionSymfonySupported;
-use App\Enum\WebServer;
+use App\Enum\WebServerPhp;
 use App\Form\Model\ServiceProjectModel;
 use App\Form\Service\AvailableServicesProvider;
 use App\Model\Project;
@@ -115,7 +118,7 @@ class ServiceProjectType extends AbstractType
             $webserverValue = $data['webserver'] ?? null;
             $language = $languageValue ? ProjectContainer::tryFrom((string) $languageValue) : null;
             $framework = $frameworkValue ? $this->getFrameworkEnum($language, $frameworkValue) : null;
-            $webserver = $webserverValue ? WebServer::tryFrom((string) $webserverValue) : null;
+            $webserver = $webserverValue ? WebServerPhp::tryFrom((string) $webserverValue) : null;
 
             $this->addDynamicFields($event->getForm(), $language, $framework, $project);
         });
@@ -202,6 +205,9 @@ class ServiceProjectType extends AbstractType
         $versionFrameworkClass = $framework instanceof FrameworkLanguageInterface ? match ($framework->getValue()) {
             'symfony' => VersionSymfonySupported::class,
             'laravel' => VersionLaravelSupported::class,
+            'nest' => VersionNestSupported::class,
+            'next' => VersionNextSupported::class,
+            'react' => VersionReactSupported::class,
             default => null,
         } : null;
 
@@ -253,7 +259,7 @@ class ServiceProjectType extends AbstractType
         // Par défaut, on propose seulement LOCAL
         // Le JavaScript se chargera de charger les webservers disponibles selon le projet
         $form->add('webServer', EnumType::class, [
-            'class' => WebServer::class,
+            'class' => WebServerPhp::class,
             'required' => true,
             'label' => 'form.webserver',
             'placeholder' => 'form.select_webserver',

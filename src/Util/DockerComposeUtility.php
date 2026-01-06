@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Util;
 
 use App\Enum\ContainerType\ServiceContainer;
-use App\Enum\WebServer;
+use App\Enum\WebServerPhp;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 
@@ -19,7 +19,7 @@ final readonly class DockerComposeUtility
     /**
      * @return string[]
      */
-    public static function getContainerWebserver(Project $project, WebServer $webServer): array
+    public static function getContainerWebserver(Project $project, WebServerPhp $webServer): array
     {
         $services = [];
 

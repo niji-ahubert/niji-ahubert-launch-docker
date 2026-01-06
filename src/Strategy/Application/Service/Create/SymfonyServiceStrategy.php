@@ -32,6 +32,7 @@ final readonly class SymfonyServiceStrategy extends AbstractServiceStrategy
             ApplicationStep::CONFIGURATION_WEBSERVER,
             ApplicationStep::PHP_QUALITY,
             ApplicationStep::ENV_FILE_APPLICATION,
+            ApplicationStep::ENTRYPOINT_ADDON_COPY,
         ];
     }
 

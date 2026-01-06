@@ -10,7 +10,7 @@ use App\Enum\Framework\FrameworkLanguageInterface;
 use App\Enum\PhpExtension;
 use App\Enum\ServiceVersion\VersionFrameworkSupportedInterface;
 use App\Enum\ServiceVersion\VersionServiceSupportedInterface;
-use App\Enum\WebServer;
+use App\Enum\WebServerPhp;
 use App\Form\Service\AvailableServicesProvider;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
@@ -167,10 +167,10 @@ class ServiceProjectController extends AbstractController
     public function getWebServers(#[EnrichedProject] Project $project): JsonResponse
     {
         try {
-            $availableWebServers = [WebServer::LOCAL];
+            $availableWebServers = [WebServerPhp::LOCAL];
             foreach ($project->getServiceContainer() as $container) {
                 $serviceName = strtolower($container->getName());
-                $webServerEnum = WebServer::tryFrom($serviceName);
+                $webServerEnum = WebServerPhp::tryFrom($serviceName);
 
                 if ($webServerEnum && !\in_array($webServerEnum, $availableWebServers, true)) {
                     $availableWebServers[] = $webServerEnum;

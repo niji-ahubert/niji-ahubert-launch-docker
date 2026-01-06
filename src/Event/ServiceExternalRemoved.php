@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Event;
 
 use App\Enum\TypeService;
-use App\Enum\WebServer;
+use App\Enum\WebServerPhp;
 use App\Form\Model\ServiceExternalModel;
 use App\Model\Project;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -53,8 +53,8 @@ final class ServiceExternalRemoved extends Event
      */
     public function isWebServerService(): bool
     {
-        $webServer = WebServer::tryFrom($this->serviceName);
+        $webServer = WebServerPhp::tryFrom($this->serviceName);
 
-        return null !== $webServer && WebServer::LOCAL !== $webServer;
+        return null !== $webServer && WebServerPhp::LOCAL !== $webServer;
     }
 }

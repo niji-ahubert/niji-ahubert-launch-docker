@@ -78,7 +78,7 @@ abstract readonly class AbstractDatabaseDockerService extends AbstractDockerServ
 
         return [
             'image' => \sprintf('%s:%s', $serviceContainer->getValue(), $service->getDockerVersionService()),
-            'container_name' => \sprintf('%s_service_database', $serviceContainer->getValue()),
+            'container_name' => \sprintf('%s_%s_%s_service', $project->getClient(), $project->getProject(), $this->getServiceContainer()->value),
             'profiles' => ['runner-dev'],
             'networks' => ['traefik'],
             'volumes' => [\sprintf('%s:/var/lib/mysql', $volumeName)],

@@ -4,51 +4,51 @@ networks:
     name: ${TRAEFIK_NETWORK}
 volumes:
   npm-cache:
+  pnpm-cache:
 services:
   node-dev:
-    container_name: container-${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}
-    image: project-${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}
-    user: ${CURRENT_UID:-1000}
-    profiles: [ 'node-dev' ]
+    user: ${HOST_UID:-1000}
+    profiles:
+      - runner-dev
     networks:
       - traefik
     build:
-      context: ${WSL_PATH_FOLDER_PROJECTS_ROOT:-${WSL_PATH_FOLDER_SOCLE_ROOT}/projects}/${CLIENT}/${PROJECT}/${FOLDER_NAME}
-      dockerfile: ${WSL_PATH_FOLDER_SOCLE_ROOT}/Dockerfile.node
-      target: node_dev
+      target: stage_dev
+      dockerfile: LauncherDockerfile
       args:
         NODE_VERSION: ${NODE_VERSION}
     volumes:
-      - ${WSL_PATH_FOLDER_PROJECTS_ROOT:-${WSL_PATH_FOLDER_SOCLE_ROOT}/projects}/${CLIENT}/${PROJECT}/${FOLDER_NAME}:/app:rw
-      - ./tools:/opt/tools
-      - npm-cache:/root/.npm:rw
+      - ${WSL_PATH_FOLDER_SOCLE_ROOT}/resources/docker/entrypoint/docker-entrypoint-node.sh:/usr/local/bin/docker-entrypoint
+      - npm-cache:/npm-cache:rw
+      - pnpm-cache:/pnpm-cache:rw
       - ~/.ssh:/home/admin/.ssh:ro
       - ~/.ssh:/root/.ssh:ro
-    env_file: "${WSL_PATH_FOLDER_PROJECTS_ROOT:-${WSL_PATH_FOLDER_SOCLE_ROOT}/projects}/${CLIENT}/${PROJECT}/config/${FOLDER_NAME}.env"
-    labels:
-      - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}.rule=Host(`${URL_LOCAL_WEBSITE}`)
-      - traefik.enable=true
-      - traefik.http.services.${CLIENT}-${PROJECT}${FOLDER_NAME}.loadbalancer.server.port=${PORT_NUMBER:-3000}
-      - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}.tls=true
     environment:
       NODE_ENV: "${NODE_ENV:-development}"
-      NPM_CONFIG_CACHE: /root/.npm
+      NPM_CONFIG_CACHE: /npm-cache
   node-prod:
-    profiles: [ 'node-prod' ]
-    image: project-${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}:${TAG_VERSION:-latest}
-    env_file: "${WSL_PATH_FOLDER_PROJECTS_ROOT:-${WSL_PATH_FOLDER_SOCLE_ROOT}/projects}/${CLIENT}/${PROJECT}/config/${FOLDER_NAME}.env"
+    user: ${HOST_UID:-1000}
+    profiles:
+      - runner-dev
+    image: ${CLIENT}-${PROJECT}-${FOLDER_NAME}-${DOCKER_ENV}:${TAG_VERSION:-latest}
+    env_file: "./projects/${CLIENT}/${PROJECT}/config/${FOLDER_NAME}.env"
     networks:
       - traefik
     build:
-      context: ${WSL_PATH_FOLDER_PROJECTS_ROOT:-${WSL_PATH_FOLDER_SOCLE_ROOT}/projects}/${CLIENT}/${PROJECT}/${FOLDER_NAME}
-      dockerfile: ${WSL_PATH_FOLDER_SOCLE_ROOT}/Dockerfile.node
-      target: node_prod
+      target: stage_prod
+      context: ${WSL_PATH_FOLDER_PROJECTS_ROOT}/${CLIENT}/${PROJECT}
       args:
         NODE_VERSION: ${NODE_VERSION}
+        PROJECT: ${PROJECT}
+        CLIENT: ${CLIENT}
+    environment:
+      NPM_CONFIG_CACHE: /npm-cache
     labels:
       - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}-prod.rule=Host(`${URL_LOCAL_WEBSITE}`)
       - traefik.enable=true
       - traefik.http.services.${CLIENT}-${PROJECT}${FOLDER_NAME}-prod.loadbalancer.server.port=${PORT_NUMBER:-3000}
       - traefik.http.routers.${CLIENT}-${PROJECT}${FOLDER_NAME}-prod.tls=true
     volumes:
-      - npm-cache:/root/.npm:rw
+      - ${WSL_PATH_FOLDER_SOCLE_ROOT}/resources/docker/entrypoint/docker-entrypoint-node.sh:/usr/local/bin/docker-entrypoint
+      - npm-cache:/npm-cache:rw
+      - pnpm-cache:/pnpm-cache:rw

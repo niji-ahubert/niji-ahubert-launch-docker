@@ -18,6 +18,9 @@ enum ApplicationStep: string
     case NODE_INIT = 'node_init';
     case SYMFONY_CREATE = 'symfony_create';
     case LARAVEL_CREATE = 'laravel_create';
+    case NEST_CREATE = 'nest_create';
+    case NEXT_CREATE = 'next_create';
+    case REACT_CREATE = 'react_create';
     case START_PAGE_PHP = 'start_page_php';
     case COMPOSER = 'composer';
     case NPM = 'npm';

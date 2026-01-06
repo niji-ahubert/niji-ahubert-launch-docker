@@ -39,20 +39,24 @@ final class EnvFileApplicationServiceStepHandler extends AbstractBuildServiceSte
             type: TypeLog::START,
         );
 
-        if ($this->filesystem->exists(\sprintf('%s/.env', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer)))) {
-            $targetEnv = \sprintf('%s/.env.niji-launcher', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer));
-            $this->filesystem->copy(\sprintf('%s/.env', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer)), $targetEnv);
+        $targetEnv = \sprintf('%s/.env.niji-launcher', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer));
+        $sourceEnv = \sprintf('%s/.env', $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer));
 
+        if ($this->filesystem->exists($sourceEnv)) {
+            $this->filesystem->copy($sourceEnv, $targetEnv);
             $content = file_get_contents($targetEnv);
             if (false === $content) {
                 return;
             }
-            /** @var EnvModifierInterface $modifier */
-            foreach ($this->envModifiers as $modifier) {
-                $content = $modifier->modify($content, $serviceContainer, $project);
-            }
-            file_put_contents($targetEnv, $content);
+        } else {
+            $content = '';
         }
+
+        /** @var EnvModifierInterface $modifier */
+        foreach ($this->envModifiers as $modifier) {
+            $content = $modifier->modify($content, $serviceContainer, $project);
+        }
+        file_put_contents($targetEnv, $content);
 
         $this->mercureService->dispatch(
             message: '✅ Création mise à jour des variables environements applicative success',

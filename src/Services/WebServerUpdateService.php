@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enum\WebServer;
+use App\Enum\WebServerPhp;
 use App\Model\Project;
 use App\Model\Service\AbstractContainer;
 
@@ -39,7 +39,7 @@ final readonly class WebServerUpdateService
             $hasUpdates = false;
             foreach ($project->getServiceContainer() as $container) {
                 if ($this->support($container, $webServerName)) {
-                    $container->getWebServer()?->setWebServer(WebServer::LOCAL);
+                    $container->getWebServer()?->setWebServer(WebServerPhp::LOCAL);
                     $hasUpdates = true;
                 }
             }

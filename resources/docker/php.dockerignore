@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Dependencies
+/node_modules
+/vendor
+
+# Symfony
+/var
+/public/build
+/public/bundles
+.env.local
+.env.local.php
+.env.*.local
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Docker
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile*
+
+# Tests
+/tests
+phpunit.xml.dist
+
+resources/*
+!resources/docker/
+resources/docker/*
+!resources/docker/php/
+!resources/docker/entrypoint/
+resources/docker/php/*
+!resources/docker/php/opcache-recommended.ini
+!resources/docker/php/www.conf
+resources/docker/entrypoint/*
+!resources/docker/entrypoint/docker-entrypoint.sh

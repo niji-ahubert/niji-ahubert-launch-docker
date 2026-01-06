@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Strategy\Step\Service\Build;
 
 use App\Enum\ApplicationStep;
+use App\Enum\ContainerType\ProjectContainer;
 use App\Enum\Log\LoggerChannel;
 use App\Enum\Log\TypeLog;
 use App\Model\Project;
@@ -70,6 +71,8 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
             );
             $this->makerGenerator->writeChanges();
         }
+
+        $this->generateDockerIgnoreIfNeeded($project, $serviceContainer);
 
         $this->mercureService->dispatch(
             message: '✅ Dockerfile généré avec success',
@@ -190,5 +193,37 @@ final class DockerFileServiceStepHandler extends AbstractBuildServiceStepHandler
     private function getCurrentContainer(): AbstractContainer
     {
         return $this->currentContainer;
+    }
+
+    /**
+     * Génère un fichier .dockerignore pour les projets si nécessaire.
+     */
+    private function generateDockerIgnoreIfNeeded(Project $project, AbstractContainer $serviceContainer): void
+    {
+        $containerType = $serviceContainer->getServiceContainer();
+        
+        if (!($containerType instanceof ProjectContainer)) {
+            return;
+        }
+
+        $projectPath = $this->fileSystemEnvironmentServices->getApplicationProjectPath($project, $serviceContainer);
+        $dockerignorePath = \sprintf('%s/.dockerignore', $projectPath);
+
+        if ($this->filesystem->exists($dockerignorePath)) {
+            return;
+        }
+
+        $templateFileName = match ($containerType) {
+            ProjectContainer::NODE => 'node.dockerignore',
+            ProjectContainer::PHP => 'php.dockerignore',
+        };
+
+        $templatePath = \sprintf('%s/%s/%s', $this->fileSystemEnvironmentServices->getProjectDir(), FileSystemEnvironmentServices::SOCLE_RESOURCES_FOLDER.'/docker', $templateFileName);
+
+        if (!$this->filesystem->exists($templatePath)) {
+            return;
+        }
+
+        $this->filesystem->copy($templatePath, $dockerignorePath);
     }
 }

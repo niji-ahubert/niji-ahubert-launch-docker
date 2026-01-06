@@ -21,11 +21,16 @@ final readonly class RedisDockerService extends AbstractDockerService
         return ['6379'];
     }
 
+    protected function getServiceContainer(): ServiceContainer
+    {
+        return ServiceContainer::REDIS;
+    }
+
     protected function getServiceSkeleton(string $volumeName, AbstractContainer $service, Project $project): array
     {
         return [
             'image' => \sprintf('%s:%s', ServiceContainer::REDIS->getValue(), $service->getDockerVersionService()),
-            'container_name' => \sprintf('%s_service', ServiceContainer::REDIS->getValue()),
+            'container_name' => \sprintf('%s_%s_%s_service', $project->getClient(), $project->getProject(), $this->getServiceContainer()->value),
             'volumes' => [\sprintf('%s:/data', $volumeName)],
             'profiles' => ['runner-dev'],
             'networks' => ['traefik'],
